@@ -1,6 +1,4 @@
-import { VStack, Alert } from '@chakra-ui/react';
-import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Button } from '@/shared/ui';
+import { VStack, Alert, Button } from '@/shared/ui';
 
 interface PaymentActionButtonProps {
   finalTotal: number;

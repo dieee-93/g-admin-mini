@@ -6,8 +6,8 @@ import {
   Grid,
   Alert,
   SimpleGrid,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import {
   ArrowTrendingUpIcon,
   LightBulbIcon,

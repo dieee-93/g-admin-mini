@@ -5,8 +5,8 @@ import {
   Text,
   Grid,
   Progress,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import type { MetricCard } from '../types';
 
 interface MetricCardsGridProps {

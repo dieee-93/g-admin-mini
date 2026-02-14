@@ -1,5 +1,4 @@
-import { SimpleGrid, VStack, Text, HStack, Alert, Badge } from '@chakra-ui/react';
-import { CardWrapper, Icon } from '@/shared/ui';
+import { SimpleGrid, VStack, Text, HStack, Alert, Badge, CardWrapper, Icon } from '@/shared/ui';
 import type { CompetitorData, MarketTrend, MarketInsight } from '../types';
 import {
   ArrowTrendingUpIcon,

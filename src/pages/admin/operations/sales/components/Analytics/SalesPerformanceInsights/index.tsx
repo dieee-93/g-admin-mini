@@ -7,7 +7,7 @@ import {
   Alert,
   Skeleton,
   Tabs,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   ChartBarIcon,

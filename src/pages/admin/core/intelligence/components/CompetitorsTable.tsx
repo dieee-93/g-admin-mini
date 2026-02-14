@@ -1,5 +1,4 @@
-import { Table, VStack, Text, HStack, Badge, IconButton } from '@chakra-ui/react';
-import { CardWrapper, Icon } from '@/shared/ui';
+import { Table, VStack, Text, HStack, Badge, IconButton, CardWrapper, Icon } from '@/shared/ui';
 import type { CompetitorData } from '../types';
 import { EyeIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 

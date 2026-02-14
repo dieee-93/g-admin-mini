@@ -4,8 +4,8 @@ import {
   Text,
   Badge,
   SimpleGrid,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import {
   UsersIcon,
   TrophyIcon,

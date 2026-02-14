@@ -1,4 +1,4 @@
-import { VStack, Alert, Progress } from '@chakra-ui/react';
+import { VStack, Alert, Progress } from '@/shared/ui';
 import { ClockIcon } from '@heroicons/react/24/outline';
 
 interface PaymentProcessingStatusProps {

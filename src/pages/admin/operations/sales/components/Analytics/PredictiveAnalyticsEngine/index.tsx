@@ -9,8 +9,8 @@ import {
   Grid,
   Alert,
   Skeleton,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';

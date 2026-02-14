@@ -6,8 +6,9 @@ import {
   Badge,
   SimpleGrid,
   Alert,
-} from '@chakra-ui/react';
-import { CardWrapper, CircularProgress } from '@/shared/ui';
+  CardWrapper,
+  CircularProgress
+} from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   ClockIcon,

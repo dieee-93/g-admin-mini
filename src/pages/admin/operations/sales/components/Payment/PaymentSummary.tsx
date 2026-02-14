@@ -1,6 +1,5 @@
 import { memo } from 'react';
-import { Text, HStack, VStack, Separator } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import { Text, HStack, VStack, Separator, CardWrapper } from '@/shared/ui';
 
 interface PaymentSummaryProps {
   subtotal: number;

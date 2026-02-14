@@ -5,8 +5,8 @@ import {
   Text,
   Badge,
   Alert,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 import type { SalesAnalytics } from '../../../../../types';
 

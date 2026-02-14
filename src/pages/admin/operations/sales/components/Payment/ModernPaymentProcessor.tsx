@@ -1,7 +1,7 @@
 // src/features/sales/components/Payment/ModernPaymentProcessor.tsx
 // 🚀 PAYMENT REVOLUTION - Modern Payment Processing System
 import { useState, useMemo } from 'react';
-import { VStack, createListCollection, Spinner, Text } from '@chakra-ui/react';
+import { VStack, createListCollection, Spinner, Text } from '@/shared/ui';
 import {
   CreditCardIcon,
   DevicePhoneMobileIcon,

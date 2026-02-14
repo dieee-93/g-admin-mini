@@ -5,8 +5,8 @@ import {
   Badge,
   Grid,
   Stat,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import type { SalesAnalytics } from '../../../../types';
 
 interface RealTimeMetricsProps {
@@ -24,40 +24,40 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({ analytics }) =
       </CardWrapper.Header>
       <CardWrapper.Body>
         <Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(5, 1fr)" }} gap="4">
-          <Stat>
+          <Stat.Root>
             <Stat.Label>Current Revenue</Stat.Label>
-            <Stat.Value>
+            <Stat.ValueText>
               ${(analytics?.current_day_metrics?.current_revenue || 0).toLocaleString()}
-            </Stat.Value>
-          </Stat>
+            </Stat.ValueText>
+          </Stat.Root>
 
-          <Stat>
+          <Stat.Root>
             <Stat.Label>Orders in Progress</Stat.Label>
-            <Stat.Value>
+            <Stat.ValueText>
               {analytics?.current_day_metrics?.orders_in_progress || 0}
-            </Stat.Value>
-          </Stat>
+            </Stat.ValueText>
+          </Stat.Root>
 
-          <Stat>
+          <Stat.Root>
             <Stat.Label>Tables Occupied</Stat.Label>
-            <Stat.Value>
+            <Stat.ValueText>
               {analytics?.current_day_metrics?.tables_occupied || 0}
-            </Stat.Value>
-          </Stat>
+            </Stat.ValueText>
+          </Stat.Root>
 
-          <Stat>
+          <Stat.Root>
             <Stat.Label>Avg Wait Time</Stat.Label>
-            <Stat.Value>
+            <Stat.ValueText>
               {Math.round(analytics?.current_day_metrics?.average_wait_time || 0)}m
-            </Stat.Value>
-          </Stat>
+            </Stat.ValueText>
+          </Stat.Root>
 
-          <Stat>
+          <Stat.Root>
             <Stat.Label>Kitchen Backlog</Stat.Label>
-            <Stat.Value color={(analytics?.current_day_metrics?.kitchen_backlog || 0) > 10 ? 'red.500' : 'green.500'}>
+            <Stat.ValueText color={(analytics?.current_day_metrics?.kitchen_backlog || 0) > 10 ? 'red.500' : 'green.500'}>
               {analytics?.current_day_metrics?.kitchen_backlog || 0}
-            </Stat.Value>
-          </Stat>
+            </Stat.ValueText>
+          </Stat.Root>
         </Grid>
       </CardWrapper.Body>
     </CardWrapper>

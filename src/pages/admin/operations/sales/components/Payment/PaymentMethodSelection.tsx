@@ -1,6 +1,5 @@
 import { memo } from 'react';
-import { Text, HStack, VStack, Grid, Badge } from '@chakra-ui/react';
-import { Button, CardWrapper } from '@/shared/ui';
+import { Text, HStack, VStack, Grid, Badge, Button, CardWrapper } from '@/shared/ui';
 import { PaymentType } from '../../types';
 
 interface PaymentMethod {

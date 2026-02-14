@@ -1,4 +1,4 @@
-import { createListCollection } from '@chakra-ui/react';
+import { createListCollection } from '@/shared/ui';
 
 // Time range options
 export const timeRangeCollection = createListCollection({

@@ -5,8 +5,8 @@ import {
   Text,
   Badge,
   SimpleGrid,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import type { PredictiveMetrics } from '../types';
 

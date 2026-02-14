@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import { Table, VStack, Text, Badge } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import { Table, VStack, Text, Badge, CardWrapper } from '@/shared/ui';
 import { CompetitorData } from '../types';
 
 interface PricingAnalysisPanelProps {

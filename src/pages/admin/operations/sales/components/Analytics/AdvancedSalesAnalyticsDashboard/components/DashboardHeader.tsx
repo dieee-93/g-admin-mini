@@ -6,9 +6,9 @@ import {
   Select,
   Button,
   createListCollection,
-  Portal
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  Portal,
+  CardWrapper
+} from '@/shared/ui';
 import { ChartBarIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
 import type { AdvancedSalesAnalytics, DateRange } from '../types';
 

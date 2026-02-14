@@ -1,5 +1,4 @@
-import { Text, HStack, VStack } from '@chakra-ui/react';
-import { Button, InputField, CardWrapper } from '@/shared/ui';
+import { Text, HStack, VStack, Button, InputField, CardWrapper } from '@/shared/ui';
 import { SplitBillType } from '../../types';
 
 interface SplitBillSetupProps {

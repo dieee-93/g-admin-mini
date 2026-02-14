@@ -4,8 +4,8 @@ import {
   Text,
   Badge,
   Table,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import {
   ChartBarIcon,
   ArrowTrendingUpIcon,

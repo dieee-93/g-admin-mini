@@ -6,9 +6,9 @@ import {
   Badge,
   Button,
   Grid,
-  Box
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  Box,
+  CardWrapper
+} from '@/shared/ui';
 import type { PerformanceInsight } from '../types';
 
 interface InsightsTabProps {

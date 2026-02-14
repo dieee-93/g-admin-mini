@@ -4,8 +4,8 @@ import {
   HStack,
   Text,
   Grid,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 
 export const AIRecommendations: React.FC = () => {

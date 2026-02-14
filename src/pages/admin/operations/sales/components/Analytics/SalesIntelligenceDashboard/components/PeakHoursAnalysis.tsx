@@ -3,8 +3,8 @@ import {
   VStack,
   Text,
   Grid,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import type { SalesAnalytics } from '../../../../types';
 
 interface PeakHoursAnalysisProps {

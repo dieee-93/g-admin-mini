@@ -6,8 +6,8 @@ import {
   Badge,
   Button,
   Select,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import {
   ChartBarIcon,
   CalendarDaysIcon,

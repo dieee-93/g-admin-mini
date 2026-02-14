@@ -12,9 +12,9 @@ import {
   Tabs,
   DNIField,
   PhoneField,
-  MobileField
+  MobileField,
+  Button
 } from '@/shared/ui';
-import { Button as ChakraButton } from '@chakra-ui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useCustomers } from '@/modules/customers/hooks';
 import { type CreateCustomerData, type Customer } from '../../types';
@@ -314,7 +314,7 @@ const CustomerFormComponent = ({ customer, onSuccess, onCancel }: CustomerFormPr
         borderColor="border"
       >
         {onCancel && (
-          <ChakraButton
+          <Button
             variant="outline"
             onClick={onCancel}
             disabled={isSubmitting}
@@ -324,10 +324,10 @@ const CustomerFormComponent = ({ customer, onSuccess, onCancel }: CustomerFormPr
             w={{ base: 'full', md: 'auto' }}
           >
             Cancelar
-          </ChakraButton>
+          </Button>
         )}
 
-        <ChakraButton
+        <Button
           colorPalette={isSubmitting ? 'gray' : 'blue'}
           type="submit"
           disabled={isSubmitting}
@@ -337,7 +337,7 @@ const CustomerFormComponent = ({ customer, onSuccess, onCancel }: CustomerFormPr
           w={{ base: 'full', md: 'auto' }}
         >
           {isSubmitting ? 'Guardando...' : isEditMode ? 'Guardar Cambios' : 'Crear Cliente'}
-        </ChakraButton>
+        </Button>
       </Flex>
     </Stack>
   );

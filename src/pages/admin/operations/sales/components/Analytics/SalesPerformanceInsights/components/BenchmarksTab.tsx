@@ -5,8 +5,8 @@ import {
   Text,
   Badge,
   Progress,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper
+} from '@/shared/ui';
 import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 import type { PerformanceMetrics } from '../types';
 

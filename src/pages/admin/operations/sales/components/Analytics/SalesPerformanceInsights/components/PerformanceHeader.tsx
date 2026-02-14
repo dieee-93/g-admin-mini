@@ -4,8 +4,9 @@ import {
   HStack,
   Text,
   Button,
-} from '@chakra-ui/react';
-import { CardWrapper, CircularProgress } from '@/shared/ui';
+  CardWrapper,
+  CircularProgress
+} from '@/shared/ui';
 import {
   TrophyIcon,
   ShieldCheckIcon,

@@ -1,5 +1,4 @@
-import { VStack, Text, HStack, Badge, Box } from '@chakra-ui/react';
-import { CardWrapper, Icon } from '@/shared/ui';
+import { VStack, Text, HStack, Badge, Box, CardWrapper, Icon } from '@/shared/ui';
 import { MarketTrend } from '../types';
 import {
   ArrowTrendingUpIcon,

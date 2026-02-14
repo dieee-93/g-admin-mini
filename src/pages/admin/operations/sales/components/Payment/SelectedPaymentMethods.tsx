@@ -1,6 +1,4 @@
-import { Text, HStack, VStack, Badge } from '@chakra-ui/react';
-import { CreditCardIcon } from '@heroicons/react/24/outline';
-import { Button, CardWrapper } from '@/shared/ui';
+import { Text, HStack, VStack, Badge, Button, CardWrapper } from '@/shared/ui';
 import { PaymentType } from '../../types';
 
 interface PaymentMethod {

@@ -7,8 +7,9 @@ import {
   Button,
   createListCollection,
   Portal,
-} from '@chakra-ui/react';
-import { CardWrapper, CircularProgress } from '@/shared/ui';
+  CardWrapper,
+  CircularProgress
+} from '@/shared/ui';
 import { BoltIcon } from '@heroicons/react/24/outline';
 import type { PredictiveMetrics, Timeframe } from '../types';
 

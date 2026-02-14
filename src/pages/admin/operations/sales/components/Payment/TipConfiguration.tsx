@@ -1,5 +1,4 @@
-import { Box, Text, VStack, Select, createListCollection } from '@chakra-ui/react';
-import { InputField, CardWrapper } from '@/shared/ui';
+import { Box, Text, VStack, Select, createListCollection, InputField, CardWrapper } from '@/shared/ui';
 
 interface TipConfigurationProps {
   tipOptions: ReturnType<typeof createListCollection>;
