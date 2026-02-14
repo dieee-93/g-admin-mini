@@ -3,10 +3,12 @@ import {
   Box,
   VStack,
   Text,
-  Link,
   Heading,
-} from '@chakra-ui/react';
-import { CardWrapper, Button, InputField } from '@/shared/ui';
+  CardWrapper,
+  Button,
+  InputField
+} from '@/shared/ui';
+import { Link } from '@chakra-ui/react';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging/Logger';
 

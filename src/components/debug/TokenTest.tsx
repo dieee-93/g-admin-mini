@@ -1,6 +1,5 @@
 import React from 'react'
-import { Box, Button, Text } from '@chakra-ui/react'
-import { Stack, Typography, CardWrapper } from '@/shared/ui'
+import { Box, Button, Text, Stack, Typography, CardWrapper } from '@/shared/ui'
 
 export const TokenTest: React.FC = () => {
   return (

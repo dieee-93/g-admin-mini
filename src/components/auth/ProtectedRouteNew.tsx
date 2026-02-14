@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { Box, Spinner, Stack } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
+import { Box, Spinner, Stack, Typography } from '@/shared/ui';
 import { useAuth, type UserRole } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {

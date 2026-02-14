@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Spinner, Center } from '@chakra-ui/react';
-import { Typography } from '@/shared/ui';
+import { Box, Spinner, Center, Typography } from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthPage } from './AuthPage';
 

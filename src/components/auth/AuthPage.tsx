@@ -3,7 +3,7 @@ import {
   Box,
   Container,
   Center,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 import { ResetPasswordForm } from './ResetPasswordForm';

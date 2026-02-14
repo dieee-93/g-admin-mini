@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, Button, Heading, VStack, InputField } from '@/shared/ui';
 import { logger } from '@/lib/logging';
-import { 
-  Button, 
-  Heading, 
-  VStack,
-  InputField
-} from '@/shared/ui';
 
 interface WelcomeScreenProps {
   onComplete: (userName: string) => void;

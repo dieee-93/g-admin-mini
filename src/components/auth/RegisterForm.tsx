@@ -3,11 +3,13 @@ import {
   Box,
   VStack,
   Text,
-  Link,
   Separator,
   Heading,
-} from '@chakra-ui/react';
-import { CardWrapper, InputField, Button } from '@/shared/ui';
+  CardWrapper,
+  InputField,
+  Button,
+} from '@/shared/ui';
+import { Link } from '@chakra-ui/react';
 
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -20,7 +22,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [full_name, setFullName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
@@ -69,7 +71,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       return;
     }
 
-    const { error: signUpError } = await signUp(email, password, fullName);
+    const { error: signUpError } = await signUp(email, password, full_name);
 
     if (signUpError) {
       setError(signUpError);
@@ -111,7 +113,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
               <InputField
                 label="Nombre completo"
                 type="text"
-                value={fullName}
+                value={full_name}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Tu nombre completo"
               />

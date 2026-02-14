@@ -3,11 +3,13 @@ import {
   Box,
   VStack,
   Text,
-  Link,
   Separator,
   Heading,
-} from '@chakra-ui/react';
-import { CardWrapper, Button, InputField } from '@/shared/ui';
+  CardWrapper,
+  Button,
+  InputField
+} from '@/shared/ui';
+import { Link } from '@chakra-ui/react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormProps {

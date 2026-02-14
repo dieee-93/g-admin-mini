@@ -21,9 +21,7 @@ import {
   Flex,
   SimpleGrid,
   Stack,
-  Text
-} from '@chakra-ui/react';
-import {
+  Text,
   Button,
   Tabs,
   SkipLink,

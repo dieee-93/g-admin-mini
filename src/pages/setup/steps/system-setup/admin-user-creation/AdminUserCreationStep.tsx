@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, VStack } from '@chakra-ui/react';
+import { Box, VStack } from '@/shared/ui';
 import { useAdminUserForm } from './hooks/useAdminUserForm';
 import { HeaderSection } from './components/HeaderSection';
 import { InfoAlert } from './components/InfoAlert';

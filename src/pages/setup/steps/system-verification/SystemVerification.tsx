@@ -1,7 +1,5 @@
 import React from 'react';
-import { Box, VStack, Stack, Text, Heading } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui/CardWrapper';
-import { Button } from '@/shared/ui/Button';
+import { Box, VStack, Stack, Text, Heading, CardWrapper, Button } from '@/shared/ui';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 
 interface SystemVerificationProps {
