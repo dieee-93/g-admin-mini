@@ -1,7 +1,5 @@
 // Team Directory Section - Editorial Brutalist Redesign
 // Clean, modern team directory with distinctive card design
-import { useState } from 'react';
-import { Spinner } from '@chakra-ui/react';
 import {
   Box,
   Stack,
@@ -15,6 +13,7 @@ import {
   IconButton,
   SegmentGroup,
   SegmentItem,
+  Spinner
 } from '@/shared/ui';
 import {
   MagnifyingGlassIcon,

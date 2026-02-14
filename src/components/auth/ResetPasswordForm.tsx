@@ -8,7 +8,7 @@ import {
   Button,
   InputField
 } from '@/shared/ui';
-import { Link } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging/Logger';
 
@@ -96,14 +96,15 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
 
               {onSwitchToLogin && (
                 <Text fontSize="sm" color="gray.600" textAlign="center">
-                  <Link
+                  <Text
+                    as="span"
                     color="blue.500"
                     onClick={onSwitchToLogin}
                     cursor="pointer"
                     _hover={{ textDecoration: 'underline' }}
                   >
                     Volver al inicio de sesión
-                  </Link>
+                  </Text>
                 </Text>
               )}
             </VStack>
@@ -165,14 +166,15 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
               {onSwitchToLogin && (
                 <Text fontSize="sm" color="gray.600" textAlign="center">
                   ¿Recordaste tu contraseña?{' '}
-                  <Link
+                  <Text
+                    as="span"
                     color="blue.500"
                     onClick={onSwitchToLogin}
                     cursor="pointer"
                     _hover={{ textDecoration: 'underline' }}
                   >
                     Iniciar sesión
-                  </Link>
+                  </Text>
                 </Text>
               )}
             </VStack>

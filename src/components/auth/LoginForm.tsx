@@ -9,7 +9,7 @@ import {
   Button,
   InputField
 } from '@/shared/ui';
-import { Link } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormProps {
@@ -127,14 +127,15 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
               {onSwitchToReset && (
                 <Text fontSize="sm" color="gray.600" textAlign="center">
                   ¿Olvidaste tu contraseña?{' '}
-                  <Link
+                  <Text
+                    as="span"
                     color="blue.500"
                     onClick={onSwitchToReset}
                     cursor="pointer"
                     _hover={{ textDecoration: 'underline' }}
                   >
                     Recuperar contraseña
-                  </Link>
+                  </Text>
                 </Text>
               )}
 
@@ -143,14 +144,15 @@ export function LoginForm({ onSwitchToRegister, onSwitchToReset }: LoginFormProp
                   <Separator />
                   <Text fontSize="sm" color="gray.600" textAlign="center">
                     ¿No tienes cuenta?{' '}
-                    <Link
+                    <Text
+                      as="span"
                       color="blue.500"
                       onClick={onSwitchToRegister}
                       cursor="pointer"
                       _hover={{ textDecoration: 'underline' }}
                     >
                       Crear cuenta
-                    </Link>
+                    </Text>
                   </Text>
                 </>
               )}

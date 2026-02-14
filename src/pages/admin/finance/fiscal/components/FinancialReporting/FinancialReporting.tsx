@@ -16,9 +16,9 @@ import {
   TabList,
   Tab,
   TabPanels,
-  TabPanel
+  TabPanel,
+  IconButton
 } from '@/shared/ui';
-import { IconButton } from '@chakra-ui/react';
 import {
   ChartBarIcon,
   DocumentTextIcon,

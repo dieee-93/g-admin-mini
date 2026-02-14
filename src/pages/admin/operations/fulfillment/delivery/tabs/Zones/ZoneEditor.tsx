@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Button, CardWrapper, Text, Alert, Box } from '@/shared/ui';
-import { Checkbox, Textarea, Input } from '@chakra-ui/react';
+import { Stack, Button, CardWrapper, Text, Alert, Box, Checkbox, Textarea, Input } from '@/shared/ui';
 import type { DeliveryZone } from '@/modules/delivery/types';
 
 interface ZoneEditorProps {

@@ -16,10 +16,11 @@ import {
   Box,
   Flex,
   Text,
+  Icon,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent
 } from '@/shared/ui';
-import { Icon } from '@/shared/ui';
-import { CheckCircleIcon, XCircleIcon, BoltIcon, QuestionMarkCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
-import { TooltipRoot, TooltipTrigger, TooltipContent } from '@chakra-ui/react';
 
 export interface MercadoPagoConfig {
   test_mode: boolean;

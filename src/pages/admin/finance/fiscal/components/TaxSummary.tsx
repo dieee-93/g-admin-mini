@@ -3,15 +3,14 @@
 // MIGRATED: Now uses centralized financial calculations
 
 import {
-  CardWrapper ,
+  CardWrapper,
   VStack,
   HStack,
   Typography,
   Badge,
-  Grid
+  Grid,
+  Separator
 } from '@/shared/ui';
-import { QuickCalculations } from '@/lib/decimal';
-import { Separator } from '@chakra-ui/react';
 import {
   DocumentTextIcon,
   CalculatorIcon,

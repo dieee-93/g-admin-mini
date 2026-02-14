@@ -9,7 +9,7 @@ import {
   InputField,
   Button,
 } from '@/shared/ui';
-import { Link } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -162,14 +162,15 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                   <Separator />
                   <Text fontSize="sm" color="gray.600" textAlign="center">
                     ¿Ya tienes cuenta?{' '}
-                    <Link
+                    <Text
+                      as="span"
                       color="blue.500"
                       onClick={onSwitchToLogin}
                       cursor="pointer"
                       _hover={{ textDecoration: 'underline' }}
                     >
                       Iniciar sesión
-                    </Link>
+                    </Text>
                   </Text>
                 </>
               )}

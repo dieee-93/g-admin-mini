@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Stack, Button, Text } from '@/shared/ui';
-import { NativeSelect } from '@chakra-ui/react';
+import { Stack, Button, Text, NativeSelect } from '@/shared/ui';
 import { useLocation } from '@/contexts/LocationContext';
 import { deliveryService } from '@/modules/delivery/services/deliveryService';
 import type { DeliveryZone, CreateDeliveryZoneData, UpdateDeliveryZoneData } from '@/modules/delivery/types';

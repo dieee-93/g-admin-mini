@@ -12,9 +12,7 @@ import {
   Box,
   Separator,
   Badge,
-  Code
-} from '@chakra-ui/react';
-import { 
+  Kbd as Code,
   ContentLayout, 
   PageHeader, 
   Section,

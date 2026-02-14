@@ -1,5 +1,5 @@
 // TeamMember Form - MIGRATED to Zod + React Hook Form validation
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   VStack,
   HStack,
@@ -11,10 +11,10 @@ import {
   Alert,
   Icon,
   SelectField,
-  createListCollection
+  createListCollection,
+  Field,
 } from '../../../../../shared/ui';
-import { Field } from '@chakra-ui/react';
-import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ExclamationTriangleIcon, ShieldCheckIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useCreateTeam, useUpdateTeam } from '@/modules/team/hooks';
 import { useTeamMemberValidation } from '@/modules/team/hooks';
 import type { TeamMember } from '../types';
@@ -33,6 +33,7 @@ interface TeamMemberFormProps {
 export function TeamMemberForm({ teamMember, isOpen, onClose, onSuccess }: TeamMemberFormProps) {
   const createMutation = useCreateTeam();
   const updateMutation = useUpdateTeam();
+  const hasLinkedUser = !!(teamMember as any)?.auth_user_id;
   const loading = createMutation.isPending || updateMutation.isPending;
 
   const isEditing = !!teamMember;
@@ -368,6 +369,68 @@ export function TeamMemberForm({ teamMember, isOpen, onClose, onSuccess }: TeamM
                         </HStack>
                       )}
                     </Field.Root>
+                  </VStack>
+                </CardWrapper.Body>
+              </CardWrapper>
+              {/* Panel Access Info */}
+              <CardWrapper variant="outline">
+                <CardWrapper.Body>
+                  <VStack gap="3" align="stretch">
+                    <HStack gap="2">
+                      <Icon icon={ShieldCheckIcon} size="sm" color="blue.500" />
+                      <Text fontWeight="semibold">Acceso al Panel</Text>
+                    </HStack>
+                    {hasLinkedUser ? (
+                      <Alert status="success">
+                        <Alert.Indicator />
+                        <VStack align="stretch" gap="2" width="full">
+                          <Alert.Description>
+                            Este empleado tiene cuenta de acceso al panel vinculada.
+                          </Alert.Description>
+                          <HStack gap="2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                // Navigate to Users page with userId filter
+                                const userId = (teamMember as any)?.auth_user_id;
+                                if (userId) {
+                                  window.location.href = `/admin/core/settings/users?userId=${userId}`;
+                                }
+                              }}
+                            >
+                              Ver cuenta de usuario
+                            </Button>
+                          </HStack>
+                        </VStack>
+                      </Alert>
+                    ) : (
+                      <Alert status="info" variant="subtle">
+                        <Alert.Indicator />
+                        <VStack align="stretch" gap="2" width="full">
+                          <Alert.Description>
+                            Este empleado no tiene acceso al panel administrativo.
+                          </Alert.Description>
+                          <Button
+                            size="sm"
+                            colorPalette="blue"
+                            onClick={() => {
+                              // Navigate to Users page with email pre-filled
+                              window.location.href = `/admin/core/settings/users?invite=true&email=${encodeURIComponent(teamMember?.email || '')}`;
+                            }}
+                            disabled={!teamMember?.email}
+                          >
+                            <Icon icon={PlusIcon} size="xs" />
+                            Dar acceso al panel
+                          </Button>
+                          {!teamMember?.email && (
+                            <Text fontSize="sm" color="fg.muted">
+                              Agrega un email al empleado para poder otorgarle acceso
+                            </Text>
+                          )}
+                        </VStack>
+                      </Alert>
+                    )}
                   </VStack>
                 </CardWrapper.Body>
               </CardWrapper>
