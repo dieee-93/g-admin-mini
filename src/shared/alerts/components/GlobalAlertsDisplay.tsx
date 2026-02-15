@@ -14,7 +14,7 @@ import {
   Box,
   VStack,
   Portal,
-} from '@chakra-ui/react';
+} from '@/shared/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertDisplay } from './AlertDisplay';
 import { useAlerts } from '../hooks/useAlerts';

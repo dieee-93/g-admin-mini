@@ -19,6 +19,10 @@ import {
   CardWrapper,
   InputField
 } from '@/shared/ui';
+import {
+  MagnifyingGlassIcon
+} from '@heroicons/react/24/outline';
+import { useDebounce } from '@/shared/hooks';
 import { useProductsPage } from '@/modules/products';
 
 export interface ProductSelectorProps {

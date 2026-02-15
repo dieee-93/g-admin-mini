@@ -9,9 +9,14 @@ import {
   Text,
   Box,
   Skeleton,
-  IconButton
-} from '@chakra-ui/react';
-import { Icon } from '@/shared/ui';
+  IconButton,
+  Icon
+} from '@/shared/ui';
+import {
+  ExclamationTriangleIcon,
+  BellIcon,
+  FireIcon
+} from '@heroicons/react/24/outline';
 import {
   ExclamationTriangleIcon,
   BellIcon,

@@ -13,6 +13,12 @@ import {
   Stack,
   Button
 } from '@/shared/ui';
+import { 
+  Cog6ToothIcon,
+  ArrowRightEndOnRectangleIcon,
+  UserIcon
+} from '@heroicons/react/24/outline';
+import { useNavigationState, useNavigationActions, useNavigationLayout } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logging';
 

@@ -12,7 +12,9 @@ import {
   IconButton,
   Badge,
   Box,
-} from '@chakra-ui/react';
+  CardWrapper,
+  Icon
+} from '@/shared/ui';
 import {
   ExclamationTriangleIcon,
   FireIcon,
@@ -27,7 +29,6 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import type { Alert as AlertType, AlertSeverity, AlertType as AlertTypeEnum } from '../types';
-import { CardWrapper, Icon } from '@/shared/ui';
 
 export interface AlertDisplayProps {
   alert: AlertType;

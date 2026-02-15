@@ -8,7 +8,8 @@ import {
   Alert,
   Separator,
   CardWrapper,
-  Button
+  Button,
+  Icon
 } from '@/shared/ui';
 import {
   FireIcon,

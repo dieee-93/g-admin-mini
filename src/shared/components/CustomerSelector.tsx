@@ -27,6 +27,14 @@ import {
     InputField,
     Button
 } from '@/shared/ui';
+import {
+    MagnifyingGlassIcon,
+    UserIcon,
+    PhoneIcon,
+    EnvelopeIcon,
+    PlusIcon
+} from '@heroicons/react/24/outline';
+import { useDebounce } from '@/shared/hooks';
 import { useCustomers } from '@/modules/customers/hooks';
 import type { Customer } from '@/pages/admin/core/crm/customers/types/customer';
 
