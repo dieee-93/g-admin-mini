@@ -7,18 +7,12 @@ import {
   Menu,
   Avatar,
   Portal,
-  Box
-} from '@chakra-ui/react';
-import { 
-  Cog6ToothIcon,
-  ArrowRightEndOnRectangleIcon,
-  UserIcon
-} from '@heroicons/react/24/outline';
-import { useNavigationState, useNavigationActions, useNavigationLayout } from '@/contexts/NavigationContext'; // ADD useNavigationLayout
-import { Icon } from '@/shared/ui/Icon';
-import { Typography } from '@/shared/ui/Typography';
-import { Stack } from '@/shared/ui/Stack';
-import { Button } from '@/shared/ui/Button';
+  Box,
+  Icon,
+  Typography,
+  Stack,
+  Button
+} from '@/shared/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logging';
 

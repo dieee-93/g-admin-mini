@@ -4,7 +4,7 @@
  * Types for the reusable TeamSelector component.
  * Designed to be injected into forms across multiple modules.
  * 
- * @see TeamAllocation in src/pages/admin/resources/team/types/teamRole.ts
+ * @see JobRole in src/modules/team/types/jobRole.ts
  * @pattern Cross-Module via ModuleRegistry.getExports()
  */
 

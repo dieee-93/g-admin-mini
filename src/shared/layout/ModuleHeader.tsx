@@ -2,7 +2,7 @@
 // 📁 src/components/layout/ModuleHeader.tsx
 // ==============================================
 
-import { Box, Heading, Button, HStack, Separator } from '@chakra-ui/react';
+import { Box, Heading, Button, HStack, Separator } from '@/shared/ui';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Breadcrumb } from '../navigation/Breadcrumb';
 import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';

@@ -1,7 +1,5 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Box, VStack, Text, Button, Alert } from '@chakra-ui/react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { CardWrapper, Icon } from '../ui';
+import { Box, VStack, Text, Button, Alert, CardWrapper, Icon } from '@/shared/ui';
 
 import { logger } from '@/lib/logging';
 interface Props {

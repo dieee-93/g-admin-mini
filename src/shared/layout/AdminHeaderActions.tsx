@@ -7,7 +7,7 @@
  * <AppShell headerActions={<AdminHeaderActions />} />
  */
 
-import { Stack } from '@chakra-ui/react';
+import { Stack } from '@/shared/ui';
 import { NavAlertBadge } from '@/shared/alerts';
 import { ConnectionStatus } from '@/lib/offline/OfflineMonitor';
 import { memo } from 'react';

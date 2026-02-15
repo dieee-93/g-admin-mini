@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Box, Spinner, VStack, Text } from '@chakra-ui/react';
+import { Box, Spinner, VStack, Text } from '@/shared/ui';
 import { ErrorBoundary } from './ErrorBoundary';
 
 interface LazyWithErrorBoundaryProps {

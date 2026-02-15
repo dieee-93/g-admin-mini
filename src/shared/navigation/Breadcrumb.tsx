@@ -2,8 +2,7 @@
 // Breadcrumb contextual para desktop
 // ✅ CORREGIDO: Clickeable navigation
 
-import { Stack, Button } from '@chakra-ui/react';
-import { Typography, Icon } from '@/shared/ui';
+import { Stack, Button, Typography, Icon } from '@/shared/ui';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useNavigationState, useNavigationActions } from '@/contexts/NavigationContext';
 

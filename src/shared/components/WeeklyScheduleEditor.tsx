@@ -1,6 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Stack, Input, Separator, Tag as ChakraTag } from '@chakra-ui/react';
-import { Typography, Icon, Button, IconButton } from '@/shared/ui';
+import { 
+  Box, 
+  Stack, 
+  Input, 
+  Separator, 
+  Badge as ChakraTag,
+  Typography, 
+  Icon, 
+  Button, 
+  IconButton 
+} from '@/shared/ui';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Schedule, DailyRule, TimeBlock } from '@/types/schedule';
 

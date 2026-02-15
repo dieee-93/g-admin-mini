@@ -11,23 +11,13 @@ import {
   Grid,
   Progress,
   Alert,
-  
   Table,
   NumberInput,
   Skeleton,
-  Tabs
-} from '@chakra-ui/react';
-import {
-  CalculatorIcon,
-  ChartBarIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  ClockIcon
-} from '@heroicons/react/24/outline';
-import { useRecipeCost } from '@/modules/recipe/hooks/useRecipeCosts';
-import type { Recipe } from '@/modules/recipe/types';
-import type { CalculateCostInput } from '@/modules/recipe/types/costing';
-import { CardWrapper, Icon } from '@/shared/ui';
+  Tabs,
+  CardWrapper,
+  Icon
+} from '@/shared/ui';
 
 import { logger } from '@/lib/logging';
 interface SmartCostCalculatorProps {

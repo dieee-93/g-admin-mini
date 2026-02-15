@@ -15,7 +15,7 @@
  * - MobileLayout, DesktopLayout (responsive navigation)
  */
 
-import { Box } from '@chakra-ui/react';
+import { Box } from '@/shared/ui';
 import { useBreakpointValue } from '@chakra-ui/react';
 import { Outlet } from 'react-router-dom';
 import { Header } from '@/shared/navigation/Header';

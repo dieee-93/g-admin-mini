@@ -7,7 +7,7 @@
  * <AppShell headerActions={<CustomerHeaderActions />} />
  */
 
-import { Stack } from '@chakra-ui/react';
+import { Stack } from '@/shared/ui';
 import { NavAlertBadge } from '@/shared/alerts';
 import { ConnectionStatus } from '@/lib/offline/OfflineMonitor';
 import { ShoppingCartHeaderIcon } from '@/modules/sales/ecommerce/components/ShoppingCartHeaderIcon';

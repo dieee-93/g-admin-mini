@@ -15,13 +15,10 @@ import {
   Flex,
   Text,
   Badge,
-  Spinner
-} from '@chakra-ui/react';
-import {
-  MagnifyingGlassIcon
-} from '@heroicons/react/24/outline';
-import { useDebounce } from '@/shared/hooks';
-import { CardWrapper, InputField } from '../ui';
+  Spinner,
+  CardWrapper,
+  InputField
+} from '@/shared/ui';
 import { useProductsPage } from '@/modules/products';
 
 export interface ProductSelectorProps {
