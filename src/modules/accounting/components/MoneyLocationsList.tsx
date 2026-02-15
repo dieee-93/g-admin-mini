@@ -3,7 +3,7 @@
  * Lista de Ubicaciones de Dinero
  */
 
-import { Box, Heading, Spinner, Stack, Text, Badge } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Stack, Text, Badge } from '@/shared/ui';
 import { useEffect, memo } from 'react';
 import { useCashData } from '@/pages/admin/finance/cash/hooks/useCashData';
 import { useCashActions } from '@/pages/admin/finance/cash/hooks/useCashActions';

@@ -1,5 +1,4 @@
-import { SimpleGrid, CardWrapper, Stack, Box } from '@/shared/ui';
-import { Skeleton } from '@chakra-ui/react';
+import { SimpleGrid, CardWrapper, Stack, Skeleton } from '@/shared/ui';
 
 export function LoadingSkeleton() {
   return (

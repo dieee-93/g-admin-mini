@@ -2,9 +2,19 @@
 // MIGRATED: Now uses centralized business logic for precise calculations
 import { useState, useEffect } from 'react';
 import {
-  Button, Badge, SimpleGrid, Typography, CardWrapper, VStack, HStack, Box
+  Button,
+  Badge,
+  SimpleGrid,
+  Typography,
+  CardWrapper,
+  VStack,
+  HStack,
+  Box,
+  Progress,
+  Table,
+  Select,
+  createListCollection
 } from '@/shared/ui';
-import { Progress, Table, Select, createListCollection } from '@chakra-ui/react';
 import { DecimalUtils } from '@/lib/decimal';
 import {
   ArrowTrendingUpIcon,

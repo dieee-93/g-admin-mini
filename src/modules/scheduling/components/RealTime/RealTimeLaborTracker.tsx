@@ -6,9 +6,8 @@
 import { useState, useEffect } from 'react';
 import {
   Stack, Button, Badge, Typography,
-  CardWrapper, SimpleGrid
+  CardWrapper, SimpleGrid, Tabs, Progress, Table, Alert, Switch, Icon
 } from '@/shared/ui';
-import { Tabs, Progress, Table, Alert, Switch } from '@chakra-ui/react';
 import {
   CurrencyDollarIcon,
   ClockIcon,

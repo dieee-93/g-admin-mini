@@ -5,8 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Stack, Button, CardWrapper, Text, Box, Alert, Tabs } from '@/shared/ui';
-import { Checkbox, Textarea, Input, Select } from '@chakra-ui/react';
+import { Stack, Button, CardWrapper, Text, Box, Alert, Tabs, Checkbox, Textarea, Input, Select } from '@/shared/ui';
 import { ZoneMapEditor } from './ZoneMapEditor';
 import type { DeliveryZone, Coordinates, CreateDeliveryZoneData, UpdateDeliveryZoneData } from '../types';
 import { logger } from '@/lib/logging';

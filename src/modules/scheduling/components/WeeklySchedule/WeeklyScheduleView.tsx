@@ -5,10 +5,8 @@ import { useState, useEffect } from 'react';
 import {
   Stack, Button, Icon, Badge, Grid,
   WeeklyCalendar, EmployeeAvailabilityCard,
-  Section
+  Section, Skeleton
 } from '@/shared/ui';
-
-import { Skeleton } from '@chakra-ui/react';
 
 // ✅ HEROICONS v2
 import {

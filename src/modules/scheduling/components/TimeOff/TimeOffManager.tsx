@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import {
   Stack, VStack, HStack, Button, Badge, SimpleGrid, Typography,
-  InputField, CardWrapper, Box, createListCollection
+  InputField, CardWrapper, Box, createListCollection,
+  Table, IconButton, Select
 } from '@/shared/ui';
-import { Table, IconButton, Select } from '@chakra-ui/react';
 import {
   CheckIcon,
   XMarkIcon,

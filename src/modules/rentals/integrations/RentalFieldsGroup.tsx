@@ -4,8 +4,7 @@
  * Example of form extension pattern
  */
 
-import { Stack, Input, Checkbox, Text } from '@/shared/ui';
-import { Field } from '@chakra-ui/react';
+import { Stack, Input, Checkbox, Text, Field } from '@/shared/ui';
 
 interface RentalFieldsGroupProps {
   register?: any; // From react-hook-form

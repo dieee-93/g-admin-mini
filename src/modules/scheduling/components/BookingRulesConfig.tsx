@@ -5,9 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Stack, Text, Grid } from '@chakra-ui/react';
-import { Button, CardWrapper, Input, Alert, Icon, SelectField } from '@/shared/ui';
-import { Field } from '@chakra-ui/react';
+import { Stack, Text, Grid, Button, CardWrapper, Input, Alert, Icon, SelectField, Field } from '@/shared/ui';
 import {
   Cog6ToothIcon,
   ClockIcon,

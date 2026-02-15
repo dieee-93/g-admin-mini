@@ -17,11 +17,6 @@ import {
   BellIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
-import {
-  ExclamationTriangleIcon,
-  BellIcon,
-  FireIcon
-} from '@heroicons/react/24/outline';
 import { useAlertsBadge, UseAlertsOptions } from '../hooks/useAlerts';
 import { useAlertsBadgeOptimized } from '../hooks/useAlertsBadgeOptimized';
 import { useAlertsActions } from '../AlertsProvider';

@@ -3,7 +3,7 @@
  * Visualización jerárquica del Plan de Cuentas
  */
 
-import { Box, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Stack, Text } from '@/shared/ui';
 import { memo } from 'react';
 import { buildAccountTree } from '../services';
 import { useChartOfAccounts } from '../hooks';

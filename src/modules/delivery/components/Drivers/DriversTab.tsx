@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Stack, Button, SimpleGrid, Text, Box } from '@/shared/ui';
-import { Input } from '@chakra-ui/react';
+import { Stack, Button, SimpleGrid, Text, Box, Input } from '@/shared/ui';
 import { UserIcon } from '@heroicons/react/24/outline';
 import type { DriverPerformance } from '../../types';
 import { DriverCard } from './DriverCard';

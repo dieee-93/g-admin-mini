@@ -5,8 +5,7 @@
  */
 
 import { useState } from 'react';
-import { Stack, Text, Grid } from '@chakra-ui/react';
-import { Tabs, CardWrapper, Icon, Badge } from '@/shared/ui';
+import { Stack, Text, Grid, Tabs, CardWrapper, Icon, Badge } from '@/shared/ui';
 import {
   ClockIcon,
   Cog6ToothIcon,

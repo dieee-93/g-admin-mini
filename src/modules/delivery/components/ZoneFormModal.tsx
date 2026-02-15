@@ -6,8 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Dialog, Stack, Text, Alert, Tabs, Box, Switch, Flex } from '@/shared/ui';
-import { Textarea, Input, NativeSelect, Button as ChakraButton } from '@chakra-ui/react';
+import { Dialog, Stack, Text, Alert, Tabs, Box, Switch, Flex, Textarea, Input, NativeSelect, Button } from '@/shared/ui';
 import { ZoneMapEditor } from './ZoneMapEditor';
 import type { DeliveryZone, Coordinates, CreateDeliveryZoneData, UpdateDeliveryZoneData } from '../types';
 import { useLocation } from '@/contexts/LocationContext';
@@ -354,7 +353,7 @@ export function ZoneFormModal({ isOpen, onClose, zone, onSave }: ZoneFormModalPr
               direction={{ base: 'column-reverse', md: 'row' }}
               w="full"
             >
-              <ChakraButton
+              <Button
                 variant="outline"
                 onClick={onClose}
                 disabled={isSaving}
@@ -364,8 +363,8 @@ export function ZoneFormModal({ isOpen, onClose, zone, onSave }: ZoneFormModalPr
                 w={{ base: 'full', md: 'auto' }}
               >
                 Cancelar
-              </ChakraButton>
-              <ChakraButton
+              </Button>
+              <Button
                 colorPalette="blue"
                 onClick={handleSave}
                 disabled={isSaving}
@@ -375,7 +374,7 @@ export function ZoneFormModal({ isOpen, onClose, zone, onSave }: ZoneFormModalPr
                 w={{ base: 'full', md: 'auto' }}
               >
                 {isSaving ? 'Guardando...' : zone ? 'Actualizar Zona' : 'Crear Zona'}
-              </ChakraButton>
+              </Button>
             </Flex>
           </Dialog.Footer>
         </Dialog.Content>

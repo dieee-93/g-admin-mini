@@ -6,7 +6,8 @@
  */
 
 import React from 'react';
-import { Box, Text, Badge, Stack, Skeleton } from '@chakra-ui/react';
+import { Box, Text, Badge, Stack, Skeleton } from '@/shared/ui';
+import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';

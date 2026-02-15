@@ -5,8 +5,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Stack, Text, Table } from '@chakra-ui/react';
 import {
+  Stack,
+  Text,
+  Table,
   Button,
   CardWrapper,
   Switch,
@@ -15,18 +17,22 @@ import {
   Alert,
   Icon,
   NativeSelect,
-  Badge} from '@/shared/ui';
+  Badge
+} from '@/shared/ui';
 import {
   UserCircleIcon,
   CheckCircleIcon,
-  XCircleIcon} from '@heroicons/react/24/outline';
+  XCircleIcon
+} from '@heroicons/react/24/outline';
 import {
   useProfessionalAvailability,
-  useBulkUpdateProfessionalAvailability} from '../hooks/useAvailability';
-import { useStaffWithLoader } from '@/modules/team/hooks';
+  useBulkUpdateProfessionalAvailability
+} from '../hooks/useAvailability';
+import { useTeamWithLoader } from '@/modules/team/hooks';
 import type {
   DayOfWeek,
-  ProfessionalScheduleDay} from '@/types/appointment';
+  ProfessionalScheduleDay
+} from '@/types/appointment';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -35,15 +41,16 @@ interface ProfessionalAvailabilityManagerProps {
 }
 
 export function ProfessionalAvailabilityManager({
-  location_id}: ProfessionalAvailabilityManagerProps) {
-  const { staff, loading: isLoadingStaff } = useStaffWithLoader();
+  location_id }: ProfessionalAvailabilityManagerProps) {
+  const { staff, loading: isLoadingStaff } = useTeamWithLoader();
   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
   const [schedule, setSchedule] = useState<ProfessionalScheduleDay[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 
   const { data: professionalSchedules, isLoading: isLoadingSchedules } = useProfessionalAvailability({
     staff_id: selectedStaffId || undefined,
-    location_id});
+    location_id
+  });
 
   const bulkUpdate = useBulkUpdateProfessionalAvailability();
 
@@ -63,7 +70,8 @@ export function ProfessionalAvailabilityManager({
             break_start_time: existing.break_start_time?.substring(0, 5),
             break_end_time: existing.break_end_time?.substring(0, 5),
             override_buffer: existing.override_buffer_minutes ?? undefined,
-            override_slot_duration: existing.override_slot_duration ?? undefined};
+            override_slot_duration: existing.override_slot_duration ?? undefined
+          };
         }
 
         // Default empty schedule
@@ -72,7 +80,8 @@ export function ProfessionalAvailabilityManager({
           enabled: false,
           start_time: '09:00',
           end_time: '18:00',
-          has_break: false};
+          has_break: false
+        };
       });
 
       setSchedule(weekSchedule);
@@ -119,10 +128,11 @@ export function ProfessionalAvailabilityManager({
       prev.map((item) =>
         item.day_of_week === day
           ? {
-              ...item,
-              has_break: !item.has_break,
-              break_start_time: !item.has_break ? '12:00' : undefined,
-              break_end_time: !item.has_break ? '13:00' : undefined}
+            ...item,
+            has_break: !item.has_break,
+            break_start_time: !item.has_break ? '12:00' : undefined,
+            break_end_time: !item.has_break ? '13:00' : undefined
+          }
           : item
       )
     );
@@ -148,7 +158,8 @@ export function ProfessionalAvailabilityManager({
           break_start_time: item.has_break && item.break_start_time ? `${item.break_start_time}:00` : undefined,
           break_end_time: item.has_break && item.break_end_time ? `${item.break_end_time}:00` : undefined,
           override_buffer_minutes: item.override_buffer,
-          override_slot_duration: item.override_slot_duration};
+          override_slot_duration: item.override_slot_duration
+        };
       });
 
     await bulkUpdate.mutateAsync({ staff_id: selectedStaffId, schedules: updates });
@@ -170,7 +181,8 @@ export function ProfessionalAvailabilityManager({
             break_start_time: existing.break_start_time?.substring(0, 5),
             break_end_time: existing.break_end_time?.substring(0, 5),
             override_buffer: existing.override_buffer_minutes ?? undefined,
-            override_slot_duration: existing.override_slot_duration ?? undefined};
+            override_slot_duration: existing.override_slot_duration ?? undefined
+          };
         }
 
         return {
@@ -178,7 +190,8 @@ export function ProfessionalAvailabilityManager({
           enabled: false,
           start_time: '09:00',
           end_time: '18:00',
-          has_break: false};
+          has_break: false
+        };
       });
 
       setSchedule(weekSchedule);
