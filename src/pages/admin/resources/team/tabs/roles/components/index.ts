@@ -1,6 +1,6 @@
 /**
- * Staff Roles Components Barrel Export
+ * Team Roles Components Barrel Export
  */
 
-export { StaffRoleFormModal } from './StaffRoleFormModal';
-export { StaffRolesList } from './StaffRolesList';
+export { TeamRoleFormModal } from './TeamRoleFormModal';
+export { TeamRolesList } from './TeamRolesList';

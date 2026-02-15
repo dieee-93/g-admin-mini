@@ -1,8 +1,8 @@
 /**
- * STAFF ROLES SETTINGS PAGE
+ * TEAM ROLES SETTINGS PAGE
  * 
  * Manage job roles for labor costing
- * Route: /admin/settings/staff/roles
+ * Route: /admin/settings/team/roles
  * 
  * @version 1.0.0
  */
@@ -25,11 +25,11 @@ import {
   Icon,
 } from '@/shared/ui';
 import { PlusIcon, SparklesIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { StaffRolesList, StaffRoleFormModal } from './components';
-import { useStaffRolesPage } from './hooks/useStaffRoles';
-import type { JobRole, StaffRoleFormData } from '../../types/jobRole';
+import { TeamRolesList, TeamRoleFormModal } from './components';
+import { useTeamRolesPage } from './hooks/useTeamRoles';
+import type { JobRole, JobRoleFormData } from '@/modules/team/types/jobRole';
 
-export default function StaffRolesPage() {
+export default function TeamRolesPage() {
   // Modal state
   const roleFormModal = useDisclosure();
   const [editingRole, setEditingRole] = useState<JobRole | null>(null);
@@ -50,7 +50,7 @@ export default function StaffRolesPage() {
     handleUpdate,
     handleDelete,
     handleToggleActive,
-  } = useStaffRolesPage();
+  } = useTeamRolesPage();
 
   // Handlers
   const handleOpenCreate = () => {
@@ -68,7 +68,7 @@ export default function StaffRolesPage() {
     setEditingRole(null);
   };
 
-  const handleSubmitForm = async (data: StaffRoleFormData) => {
+  const handleSubmitForm = async (data: JobRoleFormData) => {
     if (editingRole) {
       await handleUpdate(editingRole.id, data);
     } else {
@@ -153,8 +153,8 @@ export default function StaffRolesPage() {
         {/* Info Alert */}
         <Alert status="info" title="Roles de Trabajo vs Roles del Sistema">
           <Text fontSize="sm">
-            Los <strong>Roles de Trabajo</strong> (Cocinero, Mesero, etc.) se usan para calcular 
-            costos de mano de obra en productos. Son diferentes a los <strong>Roles del Sistema</strong> 
+            Los <strong>Roles de Trabajo</strong> (Cocinero, Mesero, etc.) se usan para calcular
+            costos de mano de obra en productos. Son diferentes a los <strong>Roles del Sistema</strong>
             (Admin, Supervisor) que controlan permisos de acceso al panel.
           </Text>
         </Alert>
@@ -165,7 +165,7 @@ export default function StaffRolesPage() {
             <Stack gap="4" align="center" py="8">
               <SparklesIcon style={{ width: 48, height: 48, color: 'var(--colors-purple-500)' }} />
               <Text textAlign="center" maxWidth="md">
-                No tienes roles de trabajo configurados. Puedes crear roles manualmente 
+                No tienes roles de trabajo configurados. Puedes crear roles manualmente
                 o usar plantillas predefinidas para tu tipo de negocio.
               </Text>
               <HStack gap="3">
@@ -180,7 +180,7 @@ export default function StaffRolesPage() {
         {/* Roles List */}
         {roles.length > 0 && (
           <Section variant="flat" title="Roles Configurados">
-            <StaffRolesList
+            <TeamRolesList
               roles={roles}
               onEdit={handleOpenEdit}
               onDelete={handleOpenDelete}
@@ -192,8 +192,8 @@ export default function StaffRolesPage() {
       </Stack>
 
       {/* Form Modal */}
-      <StaffRoleFormModal
-        isOpen={isFormModalOpen}
+      <TeamRoleFormModal
+        isOpen={roleFormModal.isOpen}
         onClose={handleCloseForm}
         onSubmit={handleSubmitForm}
         role={editingRole}

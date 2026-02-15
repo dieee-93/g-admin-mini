@@ -1,7 +1,7 @@
 /**
- * STAFF ROLE FORM MODAL
+ * TEAM ROLE FORM MODAL
  * 
- * Create and edit staff roles for labor costing
+ * Create and edit team roles for labor costing
  * 
  * @version 1.0.0
  */
@@ -21,22 +21,22 @@ import {
   Tooltip,
 } from '@/shared/ui';
 import { FormSection } from '@/shared/ui';
-import type { JobRole, StaffRoleFormData } from '../../../types/jobRole';
+import type { JobRole, JobRoleFormData } from '@/modules/team/types/jobRole';
 import {
   COMMON_ARGENTINE_CONVENTIONS,
   DEFAULT_LOADED_FACTOR_ARGENTINA,
 } from '@/modules/team/types/jobRole';
 
-interface StaffRoleFormModalProps {
+interface TeamRoleFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: StaffRoleFormData) => Promise<void>;
+  onSubmit: (data: JobRoleFormData) => Promise<void>;
   role?: JobRole | null;
   isSubmitting?: boolean;
   departments?: string[];
 }
 
-const INITIAL_FORM_DATA: StaffRoleFormData = {
+const INITIAL_FORM_DATA: JobRoleFormData = {
   name: '',
   department: '',
   description: '',
@@ -48,15 +48,15 @@ const INITIAL_FORM_DATA: StaffRoleFormData = {
   sort_order: 0,
 };
 
-export function StaffRoleFormModal({
+export function TeamRoleFormModal({
   isOpen,
   onClose,
   onSubmit,
   role,
   isSubmitting = false,
   departments = [],
-}: StaffRoleFormModalProps) {
-  const [formData, setFormData] = useState<StaffRoleFormData>(INITIAL_FORM_DATA);
+}: TeamRoleFormModalProps) {
+  const [formData, setFormData] = useState<JobRoleFormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const isEditMode = !!role;
@@ -81,7 +81,7 @@ export function StaffRoleFormModal({
     setErrors({});
   }, [isOpen, role]);
 
-  const handleFieldChange = (field: keyof StaffRoleFormData) => (
+  const handleFieldChange = (field: keyof JobRoleFormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const value = e.target.value;
@@ -106,8 +106,8 @@ export function StaffRoleFormModal({
     }
   };
 
-  const handleSwitchChange = (field: 'is_active') => (details: { checked: boolean }) => {
-    setFormData((prev) => ({ ...prev, [field]: details.checked }));
+  const handleSwitchChange = (field: 'is_active') => (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: checked }));
   };
 
   const validate = (): boolean => {
@@ -418,7 +418,7 @@ export function StaffRoleFormModal({
                   </Stack>
                   <Switch
                     checked={formData.is_active}
-                    onCheckedChange={handleSwitchChange('is_active')}
+                    onChange={handleSwitchChange('is_active')}
                   />
                 </HStack>
               </FormSection>

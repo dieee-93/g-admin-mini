@@ -53,9 +53,10 @@ interface UsersListProps {
   isLoading: boolean;
   error: string | null;
   onEditUser: (user: PanelUser) => void;
+  onLinkUser: (user: PanelUser) => void;
 }
 
-export function UsersList({ users, isLoading, error, onEditUser }: UsersListProps) {
+export function UsersList({ users, isLoading, error, onEditUser, onLinkUser }: UsersListProps) {
   if (isLoading) {
     return (
       <Stack align="center" py="8">
@@ -170,10 +171,7 @@ export function UsersList({ users, isLoading, error, onEditUser }: UsersListProp
                     <Menu.Separator />
                     <Menu.Item
                       value="link-employee"
-                      onClick={() => {
-                        // TODO: Open link employee modal
-                        console.log('Link to employee', user.id);
-                      }}
+                      onClick={() => onLinkUser(user)}
                     >
                       <Icon icon={LinkIcon} size="xs" />
                       Vincular con empleado

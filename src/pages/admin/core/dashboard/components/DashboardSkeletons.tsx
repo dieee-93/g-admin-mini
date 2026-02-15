@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Stack, Skeleton, SkeletonCircle } from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+import { Box, Stack, Skeleton, CardWrapper } from '@/shared/ui';
 import { COMPONENT_TOKENS, DASHBOARD_TOKENS } from '@/theme/tokens';
 
 /**
@@ -10,7 +9,7 @@ export const MetricCardSkeleton: React.FC = () => (
   <CardWrapper variant="outline" p={COMPONENT_TOKENS.MetricCard.padding}>
     <Stack gap={COMPONENT_TOKENS.Skeleton.gap}>
       {/* Icon area */}
-      <SkeletonCircle size="10" />
+      <Skeleton width="40px" height="40px" borderRadius="full" />
       
       {/* Value area */}
       <Stack gap={DASHBOARD_TOKENS.spacing.textGap}>

@@ -15,9 +15,9 @@ import {
   Button,
   Badge,
   Alert,
-  Icon
+  Icon,
+  Checkbox
 } from '@/shared/ui';
-import { Checkbox } from '@chakra-ui/react';
 import {
   ClockIcon,
   CpuChipIcon as CoffeeIcon,

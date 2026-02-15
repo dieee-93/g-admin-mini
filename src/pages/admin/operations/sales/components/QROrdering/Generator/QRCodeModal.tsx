@@ -4,9 +4,9 @@ import {
   VStack,
   HStack,
   Dialog,
-} from '@chakra-ui/react';
-import { Button } from '@/shared/ui/Button';
-import { InputField } from '@/shared/ui';
+  Button,
+  InputField
+} from '@/shared/ui';
 import {
   ClipboardDocumentIcon,
   PrinterIcon,

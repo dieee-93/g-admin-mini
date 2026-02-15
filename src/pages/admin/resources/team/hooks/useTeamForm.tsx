@@ -1,5 +1,5 @@
 /**
- * Staff Form Hook
+ * Team Form Hook
  * Follows Material Form Pattern - Business logic separated from UI
  *
  * Created: 2025-02-01
@@ -7,7 +7,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
-import { useStaffValidation } from '@/modules/team/hooks';
+import { useTeamValidation } from '@/modules/team/hooks';
 import type { StaffFormData } from '@/lib/validation/zod/CommonSchemas';
 
 export interface TeamMember {
@@ -24,7 +24,7 @@ export interface TeamMember {
   skills?: string[];
 }
 
-interface UseStaffFormOptions {
+interface UseTeamFormOptions {
   staffMember?: TeamMember;
   existingStaff?: TeamMember[];
   onSuccess?: () => void;
@@ -41,12 +41,12 @@ interface StaffMetrics {
   employmentRisk: 'low' | 'medium' | 'high';
 }
 
-export function useStaffForm({
+export function useTeamForm({
   staffMember,
   existingStaff = [],
   onSuccess,
   onSubmit
-}: UseStaffFormOptions) {
+}: UseTeamFormOptions) {
 
   // ===== MODO =====
   const isEditMode = !!staffMember;
@@ -66,7 +66,7 @@ export function useStaffForm({
     fieldWarnings,
     validationState,
     validateForm
-  } = useStaffValidation(
+  } = useTeamValidation(
     {
       name: staffMember?.name || '',
       email: staffMember?.email || '',
@@ -110,9 +110,9 @@ export function useStaffForm({
 
     const tenureCategory: 'new' | 'junior' | 'senior' | 'veteran' =
       tenureMonths < 3 ? 'new' :
-      tenureMonths < 12 ? 'junior' :
-      tenureMonths < 36 ? 'senior' :
-      'veteran';
+        tenureMonths < 12 ? 'junior' :
+          tenureMonths < 36 ? 'senior' :
+            'veteran';
 
     const hasSalaryInfo = !!(salary && salary > 0);
     const hasSkills = !!(skills && skills.length > 0);
@@ -120,8 +120,8 @@ export function useStaffForm({
     // Calculate employment risk
     const employmentRisk: 'low' | 'medium' | 'high' =
       status === 'inactive' || status === 'on_leave' ? 'high' :
-      !hasCompleteProfile || !hasSalaryInfo ? 'medium' :
-      'low';
+        !hasCompleteProfile || !hasSalaryInfo ? 'medium' :
+          'low';
 
     return {
       hasCompleteProfile,

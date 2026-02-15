@@ -82,20 +82,48 @@ export function useUsersPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<PanelUser | null>(null);
 
+  const [userToLink, setUserToLink] = useState<PanelUser | null>(null);
+
   const { data: users = [], isLoading, error } = useQuery({
     queryKey: ['panel-users'],
     queryFn: fetchPanelUsers,
   });
 
+  const { moduleEventBus } = require('@/shared/events/ModuleEventBus');
+
   const updateRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: SystemRole }) =>
       updateUserRole(userId, role),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      moduleEventBus.emit('user.role_changed', {
+        userId: variables.userId,
+        newRole: variables.role
+      });
       queryClient.invalidateQueries({ queryKey: ['panel-users'] });
     },
     onError: (err) => {
       logger.error('App', 'Failed to update user role', err);
     },
+  });
+
+  const linkTeamMemberMutation = useMutation({
+    mutationFn: async ({ userId, employeeId }: { userId: string; employeeId: string }) => {
+      const { error } = await supabase
+        .from('team_members')
+        .update({ auth_user_id: userId })
+        .eq('id', employeeId);
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      moduleEventBus.emit('user.linked_to_employee', {
+        userId: variables.userId,
+        employeeId: variables.employeeId
+      });
+      queryClient.invalidateQueries({ queryKey: ['panel-users'] });
+    },
+    onError: (err) => {
+      logger.error('App', 'Failed to link user to employee', err);
+    }
   });
 
   return {
@@ -104,13 +132,19 @@ export function useUsersPage() {
     error: error ? (error as Error).message : null,
     isInviteModalOpen,
     editingUser,
+    userToLink,
     openInviteModal: () => setIsInviteModalOpen(true),
     closeInviteModal: () => setIsInviteModalOpen(false),
     openEditModal: (user: PanelUser) => setEditingUser(user),
     closeEditModal: () => setEditingUser(null),
+    openLinkModal: (user: PanelUser) => setUserToLink(user),
+    closeLinkModal: () => setUserToLink(null),
     updateRole: (userId: string, role: SystemRole) =>
       updateRoleMutation.mutateAsync({ userId, role }),
+    linkUserToEmployee: (userId: string, employeeId: string) =>
+      linkTeamMemberMutation.mutateAsync({ userId, employeeId }),
     isUpdatingRole: updateRoleMutation.isPending,
+    isLinking: linkTeamMemberMutation.isPending,
     onUserInvited: () => {
       queryClient.invalidateQueries({ queryKey: ['panel-users'] });
       setIsInviteModalOpen(false);

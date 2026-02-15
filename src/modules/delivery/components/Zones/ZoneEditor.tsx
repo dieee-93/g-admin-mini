@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Button, CardWrapper, Text, Alert, Box } from '@/shared/ui';
-import { Checkbox, Textarea, Input } from '@chakra-ui/react';
+import { Stack, Button, CardWrapper, Text, Alert, Box, Checkbox, Textarea, Input } from '@/shared/ui';
 import type { DeliveryZone } from '../../types';
 
 interface ZoneEditorProps {
@@ -158,7 +157,7 @@ export function ZoneEditor({ zone, onSave, onCancel }: ZoneEditorProps) {
           </Stack>
 
           {/* Is Active Checkbox */}
-          <Checkbox isChecked={isActive} onChange={(e) => setIsActive(e.target.checked)}>
+          <Checkbox checked={isActive} onCheckedChange={(details) => setIsActive(!!details.checked)}>
             Zona Activa
           </Checkbox>
 

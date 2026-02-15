@@ -10,7 +10,6 @@ import {
   VStack,
   Alert,
   Button,
-  useDisclosure,
   DialogRoot,
   DialogBackdrop,
   DialogContent,
@@ -21,9 +20,10 @@ import {
   DialogFooter,
   Flex,
   Progress,
-  createListCollection
-} from '@chakra-ui/react';
-import { Icon } from '@/shared/ui';
+  createListCollection,
+  Icon
+} from '@/shared/ui';
+import { useDisclosure } from '@chakra-ui/react';
 import {
   WifiIcon,
   NoSymbolIcon,

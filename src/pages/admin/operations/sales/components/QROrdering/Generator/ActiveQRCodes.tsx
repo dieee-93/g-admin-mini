@@ -5,8 +5,9 @@ import {
   Badge,
   Grid,
   Button,
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  CardWrapper,
+  Icon
+} from '@/shared/ui';
 import {
   QrCodeIcon,
   PrinterIcon,

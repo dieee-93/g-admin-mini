@@ -19,9 +19,9 @@ import {
     Flex,
     Progress,
     SelectField,
-    Switch
+    Switch,
+    Button
 } from '@/shared/ui';
-import { Button as ChakraButton } from '@chakra-ui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useSupplierForm } from '../hooks/useSupplierForm';
 import type { Supplier } from '../types/supplierTypes';
@@ -372,7 +372,7 @@ const SupplierFormContentComponent = ({
                 borderTop="1px solid"
                 borderColor="border"
             >
-                <ChakraButton
+                <Button
                     variant="outline"
                     onClick={onCancel}
                     disabled={isSubmitting}
@@ -382,9 +382,9 @@ const SupplierFormContentComponent = ({
                     w={{ base: 'full', md: 'auto' }}
                 >
                     Cancelar
-                </ChakraButton>
+                </Button>
 
-                <ChakraButton
+                <Button
                     colorPalette={isSubmitting ? 'gray' : 'blue'}
                     onClick={handleSubmit}
                     disabled={validationState.hasErrors || isSubmitting}
@@ -394,7 +394,7 @@ const SupplierFormContentComponent = ({
                     w={{ base: 'full', md: 'auto' }}
                 >
                     {submitButtonContent}
-                </ChakraButton>
+                </Button>
             </Flex>
         </Stack>
     );

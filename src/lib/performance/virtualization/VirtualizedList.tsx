@@ -9,7 +9,7 @@ import React, {
   useCallback
 } from 'react';
 import type { CSSProperties } from 'react';
-import { Box, VStack } from '@chakra-ui/react';
+import { Box, VStack } from '@/shared/ui';
 
 interface VirtualizedListProps<T> {
   items: T[];

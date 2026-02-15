@@ -1,7 +1,7 @@
 /**
- * STAFF POLICIES FORM MODAL
+ * TEAM POLICIES FORM MODAL
  * 
- * Modal for editing staff policies configuration
+ * Modal for editing team policies configuration
  * Simplified version - covers main policies
  * 
  * @version 1.0.0
@@ -18,10 +18,10 @@ import {
   SelectField,
   Box,
 } from '@/shared/ui';
-import { useUpdateStaffPolicies } from '@/modules/team/hooks/useStaffPolicies';
+import { useUpdateTeamPolicies } from '@/modules/team/hooks/useTeamPolicies';
 import type { StaffPolicies, OvertimeCalculationPeriod } from '@/modules/team/services';
 
-interface StaffPoliciesFormModalProps {
+interface TeamPoliciesFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   policies: StaffPolicies;
@@ -51,11 +51,11 @@ const PERIOD_OPTIONS = [
   { value: 'monthly', label: 'Mensual' },
 ];
 
-export function StaffPoliciesFormModal({
+export function TeamPoliciesFormModal({
   isOpen,
   onClose,
   policies,
-}: StaffPoliciesFormModalProps) {
+}: TeamPoliciesFormModalProps) {
   const [formData, setFormData] = useState<FormData>({
     overtime_threshold_hours: 40,
     overtime_multiplier: 1.5,
@@ -73,7 +73,7 @@ export function StaffPoliciesFormModal({
     termination_notice_period_days: 15,
   });
 
-  const updatePolicies = useUpdateStaffPolicies();
+  const updatePolicies = useUpdateTeamPolicies();
 
   useEffect(() => {
     if (isOpen && policies) {

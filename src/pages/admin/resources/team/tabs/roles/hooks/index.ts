@@ -1,5 +1,5 @@
 /**
- * Staff Roles Hooks Barrel Export
+ * Team Roles Hooks Barrel Export
  */
 
-export * from './useStaffRoles';
+export * from './useTeamRoles';

@@ -1,7 +1,7 @@
 /**
- * USE STAFF ROLES HOOK
+ * USE TEAM ROLES HOOK
  * 
- * React Query hooks for staff roles CRUD operations
+ * React Query hooks for team roles CRUD operations
  * 
  * @version 1.0.0
  */
@@ -9,32 +9,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useOrganization } from '@/hooks/useOrganization';
 import {
-  getStaffRoles,
-  getStaffRole,
-  createStaffRole,
-  updateStaffRole,
-  deleteStaffRole,
-  getStaffRoleDepartments,
+  getTeamRoles,
+  getTeamRole,
+  createTeamRole,
+  updateTeamRole,
+  deleteTeamRole,
+  getTeamRoleDepartments,
 } from '@/modules/team/services/index';
-import type { JobRole, StaffRoleFormData, StaffRoleFilters } from '@/modules/team/types/index';
+import type { JobRole, JobRoleFormData, JobRoleFilters } from '@/modules/team/types/index';
 
 // Query keys
-export const staffRolesKeys = {
-  all: ['staff-roles'] as const,
-  lists: () => [...staffRolesKeys.all, 'list'] as const,
-  list: (filters?: StaffRoleFilters) => [...staffRolesKeys.lists(), filters] as const,
-  details: () => [...staffRolesKeys.all, 'detail'] as const,
-  detail: (id: string) => [...staffRolesKeys.details(), id] as const,
-  departments: () => [...staffRolesKeys.all, 'departments'] as const,
+export const teamRolesKeys = {
+  all: ['team-roles'] as const,
+  lists: () => [...teamRolesKeys.all, 'list'] as const,
+  list: (filters?: JobRoleFilters) => [...teamRolesKeys.lists(), filters] as const,
+  details: () => [...teamRolesKeys.all, 'detail'] as const,
+  detail: (id: string) => [...teamRolesKeys.details(), id] as const,
+  departments: () => [...teamRolesKeys.all, 'departments'] as const,
 };
 
 /**
  * Hook to fetch all staff roles
  */
-export function useStaffRoles(filters?: StaffRoleFilters) {
+/**
+ * Hook to fetch all team roles
+ */
+export function useTeamRoles(filters?: JobRoleFilters) {
   return useQuery({
-    queryKey: staffRolesKeys.list(filters),
-    queryFn: () => getStaffRoles(filters),
+    queryKey: teamRolesKeys.list(filters),
+    queryFn: () => getTeamRoles(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
@@ -42,10 +45,13 @@ export function useStaffRoles(filters?: StaffRoleFilters) {
 /**
  * Hook to fetch a single staff role
  */
-export function useStaffRole(id: string | undefined) {
+/**
+ * Hook to fetch a single team role
+ */
+export function useTeamRole(id: string | undefined) {
   return useQuery({
-    queryKey: staffRolesKeys.detail(id || ''),
-    queryFn: () => getStaffRole(id!),
+    queryKey: teamRolesKeys.detail(id || ''),
+    queryFn: () => getTeamRole(id!),
     enabled: !!id,
   });
 }
@@ -53,10 +59,13 @@ export function useStaffRole(id: string | undefined) {
 /**
  * Hook to fetch unique departments
  */
-export function useStaffRoleDepartments() {
+/**
+ * Hook to fetch unique departments
+ */
+export function useTeamRoleDepartments() {
   return useQuery({
-    queryKey: staffRolesKeys.departments(),
-    queryFn: getStaffRoleDepartments,
+    queryKey: teamRolesKeys.departments(),
+    queryFn: getTeamRoleDepartments,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
@@ -64,19 +73,22 @@ export function useStaffRoleDepartments() {
 /**
  * Hook to create a staff role
  */
-export function useCreateStaffRole() {
+/**
+ * Hook to create a team role
+ */
+export function useCreateTeamRole() {
   const queryClient = useQueryClient();
   const { organization } = useOrganization();
 
   return useMutation({
-    mutationFn: (data: StaffRoleFormData) => {
+    mutationFn: (data: JobRoleFormData) => {
       if (!organization?.id) {
         throw new Error('No organization selected');
       }
-      return createStaffRole(data, organization.id);
+      return createTeamRole(data, organization.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: staffRolesKeys.all });
+      queryClient.invalidateQueries({ queryKey: teamRolesKeys.all });
     },
   });
 }
@@ -84,15 +96,18 @@ export function useCreateStaffRole() {
 /**
  * Hook to update a staff role
  */
-export function useUpdateStaffRole() {
+/**
+ * Hook to update a team role
+ */
+export function useUpdateTeamRole() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<StaffRoleFormData> }) =>
-      updateStaffRole(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<JobRoleFormData> }) =>
+      updateTeamRole(id, data),
     onSuccess: (updatedRole) => {
-      queryClient.invalidateQueries({ queryKey: staffRolesKeys.lists() });
-      queryClient.setQueryData(staffRolesKeys.detail(updatedRole.id), updatedRole);
+      queryClient.invalidateQueries({ queryKey: teamRolesKeys.lists() });
+      queryClient.setQueryData(teamRolesKeys.detail(updatedRole.id), updatedRole);
     },
   });
 }
@@ -100,13 +115,16 @@ export function useUpdateStaffRole() {
 /**
  * Hook to delete a staff role
  */
-export function useDeleteStaffRole() {
+/**
+ * Hook to delete a team role
+ */
+export function useDeleteTeamRole() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteStaffRole(id),
+    mutationFn: (id: string) => deleteTeamRole(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: staffRolesKeys.all });
+      queryClient.invalidateQueries({ queryKey: teamRolesKeys.all });
     },
   });
 }
@@ -114,34 +132,37 @@ export function useDeleteStaffRole() {
 /**
  * Hook to toggle staff role active status
  */
-export function useToggleStaffRoleActive() {
+/**
+ * Hook to toggle team role active status
+ */
+export function useToggleTeamRoleActive() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      updateStaffRole(id, { is_active: isActive }),
+      updateTeamRole(id, { is_active: isActive }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: staffRolesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: teamRolesKeys.lists() });
     },
   });
 }
 
 /**
- * Combined hook for the StaffRoles page
+ * Combined hook for the TeamRoles page
  */
-export function useStaffRolesPage() {
-  const rolesQuery = useStaffRoles();
-  const departmentsQuery = useStaffRoleDepartments();
-  const createMutation = useCreateStaffRole();
-  const updateMutation = useUpdateStaffRole();
-  const deleteMutation = useDeleteStaffRole();
-  const toggleActiveMutation = useToggleStaffRoleActive();
+export function useTeamRolesPage() {
+  const rolesQuery = useTeamRoles();
+  const departmentsQuery = useTeamRoleDepartments();
+  const createMutation = useCreateTeamRole();
+  const updateMutation = useUpdateTeamRole();
+  const deleteMutation = useDeleteTeamRole();
+  const toggleActiveMutation = useToggleTeamRoleActive();
 
-  const handleCreate = async (data: StaffRoleFormData): Promise<void> => {
+  const handleCreate = async (data: JobRoleFormData): Promise<void> => {
     await createMutation.mutateAsync(data);
   };
 
-  const handleUpdate = async (id: string, data: Partial<StaffRoleFormData>): Promise<void> => {
+  const handleUpdate = async (id: string, data: Partial<JobRoleFormData>): Promise<void> => {
     await updateMutation.mutateAsync({ id, data });
   };
 
@@ -160,24 +181,24 @@ export function useStaffRolesPage() {
     // Data
     roles: rolesQuery.data || [],
     departments: departmentsQuery.data || [],
-    
+
     // Loading states
     isLoading: rolesQuery.isLoading,
     isError: rolesQuery.isError,
     error: rolesQuery.error,
-    
+
     // Mutation states
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
     isToggling: toggleActiveMutation.isPending ? toggleActiveMutation.variables?.id : null,
-    
+
     // Actions
     handleCreate,
     handleUpdate,
     handleDelete,
     handleToggleActive,
-    
+
     // Refetch
     refetch: rolesQuery.refetch,
   };

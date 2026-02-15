@@ -1,11 +1,9 @@
 import React, { memo } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Button, Icon } from '@/shared/ui';
 import { useNavigate as useRouterNavigate } from 'react-router-dom';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/modules/sales/ecommerce/hooks/useCart';
-import { Button } from '@/shared/ui/Button';
-import { Icon } from '@/shared/ui/Icon';
 
 export const ShoppingCartHeaderIcon = memo(function ShoppingCartHeaderIcon() {
   const { user } = useAuth();

@@ -6,6 +6,7 @@
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging';
 import eventBus from '@/lib/events/EventBus';
+import { getUserContext } from '@/lib/auth/userContext';
 import type {
   SupplierOrderFormData,
   SupplierOrderWithDetails,
@@ -111,7 +112,10 @@ export async function createSupplierOrder(
   orderData: SupplierOrderFormData
 ): Promise<CreateOrderResponse> {
   try {
-    // 1. Create order
+    // 1. Get user context for audit trail
+    const userContext = await getUserContext();
+
+    // 2. Create order
     const orderInsert = {
       supplier_id: orderData.supplier_id,
       po_number: orderData.po_number,
@@ -132,7 +136,7 @@ export async function createSupplierOrder(
       throw orderError;
     }
 
-    // 2. Create order items
+    // 3. Create order items
     const itemsInsert = orderData.items.map(item => ({
       supplier_order_id: order.id,
       material_id: item.material_id,
@@ -152,10 +156,10 @@ export async function createSupplierOrder(
       throw itemsError;
     }
 
-    // 3. Emit event
+    // 4. Emit event with real user context
     const metadata: OrderEventMetadata = {
       event_type: 'order_created',
-      user_id: 'current-user', // TODO: Get from auth
+      user_id: userContext.id,
       order_id: order.id,
       supplier_id: order.supplier_id,
       po_number: order.po_number || undefined,
@@ -220,25 +224,28 @@ export async function receiveSupplierOrder(
   receiveData: ReceiveOrderData
 ): Promise<ReceiveOrderResponse> {
   try {
-    // 1. Get order details
+    // 1. Get user context for audit trail
+    const userContext = await getUserContext();
+
+    // 2. Get order details
     const order = await fetchSupplierOrderById(receiveData.order_id);
     if (!order) {
       throw new Error('Order not found');
     }
 
-    // 2. Create stock entries with Event Sourcing metadata
+    // 3. Create stock entries with Event Sourcing metadata
     const stockEntries = [];
-    
+
     for (const item of receiveData.items) {
       const orderItem = order.items?.find(oi => oi.id === item.order_item_id);
       if (!orderItem) {
         throw new Error(`Order item ${item.order_item_id} not found`);
       }
 
-      // Event Sourcing metadata
+      // Event Sourcing metadata with real user context
       const metadata = {
         event_type: 'supplier_order_received',
-        user_id: 'current-user', // TODO: Get from auth
+        user_id: userContext.id,
         business_context: {
           supplier_id: order.supplier?.id,
           supplier_name: order.supplier?.name,
@@ -252,6 +259,7 @@ export async function receiveSupplierOrder(
         },
         audit_trail: {
           received_at: receiveData.received_at,
+          received_by: userContext.name,
           notes: item.notes || receiveData.notes,
           timestamp: new Date().toISOString()
         }
@@ -332,17 +340,18 @@ export async function receiveSupplierOrder(
       }
     }
 
-    // 5. Emit order received event
+    // 5. Emit order received event with real user context
     const orderMetadata: OrderEventMetadata = {
       event_type: 'order_received',
-      user_id: 'current-user', // TODO: Get from auth
+      user_id: userContext.id,
       order_id: order.id,
       supplier_id: order.supplier?.id || '',
       po_number: order.po_number || undefined,
       total_amount: order.total_amount || 0,
       items_count: receiveData.items.length,
       business_context: {
-        received_by: 'current-user', // TODO: Get from auth
+        received_by: userContext.name,
+        received_by_role: userContext.role,
         reason: receiveData.notes
       },
       audit_trail: {

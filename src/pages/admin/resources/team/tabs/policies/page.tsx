@@ -22,17 +22,17 @@ import {
   Box,
 } from '@/shared/ui';
 import {
-  useSystemStaffPolicies,
+  useSystemTeamPolicies,
   useToggleOvertime,
   useToggleCertificationTracking,
   useToggleShiftSwapApproval,
 } from '@/modules/team/hooks';
-import { StaffPoliciesFormModal } from './components/StaffPoliciesFormModal';
+import { TeamPoliciesFormModal } from './components/TeamPoliciesFormModal';
 
 export default function StaffPoliciesPage() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
-  const { data: policies, isLoading, error } = useSystemStaffPolicies();
+  const { data: policies, isLoading, error } = useSystemTeamPolicies();
 
   const toggleOvertime = useToggleOvertime();
   const toggleCertificationTracking = useToggleCertificationTracking();
@@ -184,10 +184,10 @@ export default function StaffPoliciesPage() {
                         {policies.overtime_calculation_period === 'weekly'
                           ? 'Semanal'
                           : policies.overtime_calculation_period === 'biweekly'
-                          ? 'Quincenal'
-                          : policies.overtime_calculation_period === 'monthly'
-                          ? 'Mensual'
-                          : 'Diario'}
+                            ? 'Quincenal'
+                            : policies.overtime_calculation_period === 'monthly'
+                              ? 'Mensual'
+                              : 'Diario'}
                       </Text>
                     </Flex>
                   </Stack>
@@ -501,7 +501,7 @@ export default function StaffPoliciesPage() {
         </Section>
       </Stack>
 
-      <StaffPoliciesFormModal
+      <TeamPoliciesFormModal
         isOpen={isFormModalOpen}
         onClose={handleCloseForm}
         policies={policies}

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, ReactNode } from 'react';
-import { Box, Skeleton, VStack } from '@chakra-ui/react';
+import { Box, Skeleton, VStack } from '@/shared/ui';
 import type { LazyComponentOptions } from './types';
 import { errorHandler } from '@/lib/error-handling';
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { Box, Heading, Text, Button, VStack } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, VStack } from '@/shared/ui';
 import { errorHandler, ErrorType, ErrorSeverity } from './ErrorHandler';
 
 interface Props {

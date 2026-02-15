@@ -111,6 +111,15 @@ export function InviteUserModal({ isOpen, onClose, onSuccess, prefillEmail }: In
 
       const userId = data.userId;
 
+      // Emit event
+      const { moduleEventBus } = await import('@/shared/events/ModuleEventBus');
+      moduleEventBus.emit('user.invited', {
+        userId,
+        email: formData.email,
+        role: formData.role,
+        invitedBy: (await supabase.auth.getUser()).data.user?.id
+      });
+
       // NEW: If is_employee checked, handle linking
       if (formData.is_employee && formData.link_option === 'link_existing' && formData.selected_employee_id) {
         await supabase
@@ -119,6 +128,11 @@ export function InviteUserModal({ isOpen, onClose, onSuccess, prefillEmail }: In
           .eq('id', formData.selected_employee_id);
 
         logger.info('App', 'User linked to employee', { userId, employeeId: formData.selected_employee_id });
+
+        moduleEventBus.emit('user.linked_to_employee', {
+          userId,
+          employeeId: formData.selected_employee_id
+        });
       }
 
       logger.info('App', 'Panel user invited successfully', { userId, role: formData.role });

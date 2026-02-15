@@ -22,9 +22,9 @@ import {
   ArrowTrendingDownIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { useStaffWithLoader } from '@/modules/team/hooks';
+import { useTeamWithLoader } from '@/modules/team/hooks';
 import { getDepartmentPerformance, getPerformanceTrends, getTopPerformers } from '@/modules/team/services';
-import type { StaffViewState } from '../../types';
+import type { TeamViewState } from '../../types';
 import { logger } from '@/lib/logging';
 
 // Performance data types
@@ -32,7 +32,7 @@ interface PerformanceTrend {
   month: string;
   avgPerformance: number;
   avgAttendance: number;
-  employeeCount: number;
+  teamMemberCount: number;
   turnoverRate: number;
 }
 
@@ -57,8 +57,8 @@ interface TopPerformer {
 }
 
 interface PerformanceSectionProps {
-  viewState: StaffViewState;
-  onViewStateChange: (state: StaffViewState) => void;
+  viewState: TeamViewState;
+  onViewStateChange: (state: TeamViewState) => void;
 }
 
 // TODO: Implement MiniBarChart when chart visualization is needed
@@ -107,7 +107,7 @@ function SimpleLineChart({ data, label }: { data: PerformanceTrend[], label: str
 }
 
 export function PerformanceSection({ viewState: _viewState, onViewStateChange: _onViewStateChange }: PerformanceSectionProps) {
-  const { staff, loading: staffLoading } = useStaffWithLoader();
+  const { team: teamMembers, loading: teamLoading } = useTeamWithLoader();
   const [loading, setLoading] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('6');
   const [activeTab, setActiveTab] = useState('overview');
@@ -135,7 +135,7 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
       setPerformanceTrends(trendData);
       setTopPerformers(topData);
     } catch (error) {
-      logger.error('StaffStore', 'Error loading analytics:', error);
+      logger.error('TeamStore', 'Error loading analytics:', error);
     } finally {
       setLoading(false);
     }
@@ -143,14 +143,14 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
 
   // Calculate overall metrics
   const overallMetrics = {
-    avgPerformance: staff.length > 0
-      ? Math.round(staff.reduce((sum, s) => sum + s.performance_score, 0) / staff.length)
+    avgPerformance: teamMembers.length > 0
+      ? Math.round(teamMembers.reduce((sum, s) => sum + (s.performance_score || 0), 0) / teamMembers.length)
       : 0,
-    avgAttendance: staff.length > 0
-      ? Math.round(staff.reduce((sum, s) => sum + s.attendance_rate, 0) / staff.length)
+    avgAttendance: teamMembers.length > 0
+      ? Math.round(teamMembers.reduce((sum, s) => sum + (s.attendance_rate || 0), 0) / teamMembers.length)
       : 0,
-    topPerformerCount: staff.filter(s => s.performance_score >= 90).length,
-    needsImprovementCount: staff.filter(s => s.performance_score < 75).length
+    topPerformerCount: teamMembers.filter(s => (s.performance_score || 0) >= 90).length,
+    needsImprovementCount: teamMembers.filter(s => (s.performance_score || 0) < 75).length
   };
 
   // Get performance trend
@@ -163,7 +163,7 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
     };
   };
 
-  if (staffLoading || loading) {
+  if (teamLoading || loading) {
     return (
       <Stack direction="column" gap="4" py="8">
         <Spinner size="lg" />
@@ -249,8 +249,8 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
       </SimpleGrid>
 
       {/* Analytics Tabs */}
-      <Tabs.Root 
-        value={activeTab} 
+      <Tabs.Root
+        value={activeTab}
         onValueChange={(details) => setActiveTab(details.value || 'overview')}
         variant="enclosed"
         size="lg"
@@ -283,9 +283,9 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
                       <Text>Excelente (90-100%)</Text>
                     </Stack>
                     <Stack direction="row" gap="2">
-                      <Text fontWeight="medium">{staff.filter(s => s.performance_score >= 90).length}</Text>
+                      <Text fontWeight="medium">{teamMembers.filter(s => (s.performance_score || 0) >= 90).length}</Text>
                       <Progress
-                        value={(staff.filter(s => s.performance_score >= 90).length / staff.length) * 100}
+                        value={(teamMembers.filter(s => (s.performance_score || 0) >= 90).length / teamMembers.length) * 100}
                         size="sm"
                         w="100px"
                         colorPalette="green"
@@ -299,9 +299,9 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
                       <Text>Bueno (75-89%)</Text>
                     </Stack>
                     <Stack direction="row" gap="2">
-                      <Text fontWeight="medium">{staff.filter(s => s.performance_score >= 75 && s.performance_score < 90).length}</Text>
+                      <Text fontWeight="medium">{teamMembers.filter(s => (s.performance_score || 0) >= 75 && (s.performance_score || 0) < 90).length}</Text>
                       <Progress
-                        value={(staff.filter(s => s.performance_score >= 75 && s.performance_score < 90).length / staff.length) * 100}
+                        value={(teamMembers.filter(s => (s.performance_score || 0) >= 75 && (s.performance_score || 0) < 90).length / teamMembers.length) * 100}
                         size="sm"
                         w="100px"
                         colorPalette="blue"
@@ -315,9 +315,9 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
                       <Text>Necesita Mejora (&lt;75%)</Text>
                     </Stack>
                     <Stack direction="row" gap="2">
-                      <Text fontWeight="medium">{staff.filter(s => s.performance_score < 75).length}</Text>
+                      <Text fontWeight="medium">{teamMembers.filter(s => (s.performance_score || 0) < 75).length}</Text>
                       <Progress
-                        value={(staff.filter(s => s.performance_score < 75).length / staff.length) * 100}
+                        value={(teamMembers.filter(s => (s.performance_score || 0) < 75).length / teamMembers.length) * 100}
                         size="sm"
                         w="100px"
                         colorPalette="orange"
@@ -405,7 +405,7 @@ export function PerformanceSection({ viewState: _viewState, onViewStateChange: _
                             <Progress value={trend.avgAttendance} size="sm" w="60px" />
                           </Stack>
                         </td>
-                        <td className="p-2">{trend.employeeCount}</td>
+                        <td className="p-2">{trend.teamMemberCount}</td>
                         <td className="p-2">{trend.turnoverRate}%</td>
                       </tr>
                     ))}

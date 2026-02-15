@@ -5,29 +5,21 @@
  */
 
 import { useState } from 'react';
+import { Section, Stack, Button, Badge, Switch, Text, Flex, Box } from '@/shared/ui';
+import { useDisclosure } from '@/shared/hooks/useDisclosure';
 import {
-  Section,
-  Stack,
-  Button,
-  Badge,
-  Switch,
-  Text,
-  Flex,
-  Box,
-} from '@/shared/ui';
-import {
-  useSystemStaffPolicies,
+  useSystemTeamPolicies,
   useToggleOvertime,
   useToggleCertificationTracking,
   useToggleShiftSwapApproval,
 } from '@/modules/team/hooks';
-import { StaffPoliciesFormModal } from './components/StaffPoliciesFormModal';
+import { TeamPoliciesFormModal } from './components/TeamPoliciesFormModal';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 export function StaffPoliciesTab() {
   const policiesFormModal = useDisclosure();
 
-  const { data: policies, isLoading, error } = useSystemStaffPolicies();
+  const { data: policies, isLoading, error } = useSystemTeamPolicies();
 
   const toggleOvertime = useToggleOvertime();
   const toggleCertificationTracking = useToggleCertificationTracking();
@@ -84,7 +76,7 @@ export function StaffPoliciesTab() {
       <Section
         title="Horarios Laborales"
         actions={
-          <Button size="sm" variant="outline" onClick={handleOpenForm}>
+          <Button size="sm" variant="outline" onClick={policiesFormModal.onOpen}>
             <PencilSquareIcon style={{ width: '16px', height: '16px' }} />
             Editar
           </Button>
@@ -422,10 +414,10 @@ export function StaffPoliciesTab() {
       </Section>
 
       {/* Form Modal */}
-      <StaffPoliciesFormModal
+      <TeamPoliciesFormModal
         isOpen={policiesFormModal.isOpen}
         onClose={policiesFormModal.onClose}
-        settings={policies}
+        policies={policies}
       />
     </Stack>
   );

@@ -18,6 +18,7 @@ import { useUsersPage } from './hooks/useUsersPage';
 import { UsersList } from './components/UsersList';
 import { InviteUserModal } from './components/InviteUserModal';
 import { EditUserRoleModal } from './components/EditUserRoleModal';
+import { LinkEmployeeModal } from './components/LinkEmployeeModal';
 
 export default function UsersPage() {
   const navigate = useNavigate();
@@ -27,11 +28,15 @@ export default function UsersPage() {
     error,
     isInviteModalOpen,
     editingUser,
+    userToLink,
     openInviteModal,
     closeInviteModal,
     openEditModal,
     closeEditModal,
+    openLinkModal,
+    closeLinkModal,
     updateRole,
+    linkUserToEmployee,
     onUserInvited,
   } = useUsersPage();
 
@@ -46,7 +51,6 @@ export default function UsersPage() {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/admin/core/settings')}
-              px="2"
             >
               <Icon icon={ChevronLeftIcon} size="xs" />
               Configuración
@@ -71,7 +75,7 @@ export default function UsersPage() {
 
         {/* Lista de usuarios */}
         <Section
-          variant="outline"
+          variant="default"
           title="Usuarios del Panel"
           description="Personas con credenciales de acceso al sistema"
         >
@@ -80,6 +84,7 @@ export default function UsersPage() {
             isLoading={isLoading}
             error={error}
             onEditUser={openEditModal}
+            onLinkUser={openLinkModal}
           />
         </Section>
 
@@ -99,7 +104,7 @@ export default function UsersPage() {
           ))}
           <Text fontSize="xs" color="fg.subtle">
             Para vincular con un empleado →{' '}
-            <Button variant="link" size="xs" onClick={() => navigate('/admin/resources/team')}>
+            <Button variant="ghost" size="xs" onClick={() => navigate('/admin/resources/team')}>
               Equipo
             </Button>
           </Text>
@@ -119,6 +124,15 @@ export default function UsersPage() {
           isOpen={!!editingUser}
           onClose={closeEditModal}
           onSave={updateRole}
+        />
+      )}
+
+      {userToLink && (
+        <LinkEmployeeModal
+          user={userToLink}
+          isOpen={!!userToLink}
+          onClose={closeLinkModal}
+          onLink={linkUserToEmployee}
         />
       )}
     </ContentLayout>

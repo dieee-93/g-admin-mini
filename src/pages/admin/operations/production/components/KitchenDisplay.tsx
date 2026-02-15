@@ -13,9 +13,10 @@ import {
   Alert,
   Select,
   createListCollection,
-  Separator
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  Separator,
+  CardWrapper,
+  Icon
+} from '@/shared/ui';
 import { logger } from '@/lib/logging';
 import {
   FireIcon,

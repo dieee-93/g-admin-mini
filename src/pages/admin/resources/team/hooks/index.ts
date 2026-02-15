@@ -1,6 +1,6 @@
-// Staff Hooks - Barrel Exports
+// Team Hooks - Barrel Exports
 
-export { useStaffForm } from './useStaffForm';
-export type { TeamMember } from './useStaffForm';
+export { useTeamForm } from './useTeamForm';
+export type { TeamMember } from './useTeamForm';
 
 export * from './useTeamPage';

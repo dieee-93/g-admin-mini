@@ -5,9 +5,9 @@ import {
   Text,
   VStack,
   HStack,
-  createListCollection
-} from '@chakra-ui/react';
-import { CardWrapper } from '@/shared/ui';
+  createListCollection,
+  CardWrapper
+} from '@/shared/ui';
 import {
   QrCodeIcon,
 } from '@heroicons/react/24/outline';

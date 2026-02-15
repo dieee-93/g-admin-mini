@@ -19,7 +19,7 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 // TODO: Use ArrowTrendingDownIcon for performance trend indicators
-import { useStaffWithLoader, usePerformanceAnalytics } from '@/modules/team/hooks';
+import { useTeamWithLoader, usePerformanceAnalytics } from '@/modules/team/hooks';
 import type { TopPerformer, PerformanceAlert } from '../types';
 
 import { logger } from '@/lib/logging';
@@ -29,7 +29,7 @@ interface PerformanceDashboardProps {
 }
 
 export function PerformanceDashboard({ compact = false, showDetails = true }: PerformanceDashboardProps) {
-  const { staff, loading: staffLoading } = useStaffWithLoader();
+  const { staff, loading: staffLoading } = useTeamWithLoader();
   const { loading: analyticsLoading, loadTopPerformers, loadDepartmentPerformance } = usePerformanceAnalytics();
   const [topPerformers, setTopPerformers] = useState<TopPerformer[]>([]);
   const [alerts, setAlerts] = useState<PerformanceAlert[]>([]);
@@ -51,7 +51,7 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
 
       // Generate performance alerts
       const performanceAlerts = [];
-      
+
       // Check for low performers
       const lowPerformers = staff.filter(s => s.performance_score < 75);
       if (lowPerformers.length > 0) {
@@ -94,11 +94,11 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
 
   // Calculate key metrics
   const metrics = {
-    avgPerformance: staff.length > 0 
-      ? Math.round(staff.reduce((sum, s) => sum + s.performance_score, 0) / staff.length) 
+    avgPerformance: staff.length > 0
+      ? Math.round(staff.reduce((sum, s) => sum + s.performance_score, 0) / staff.length)
       : 0,
-    avgAttendance: staff.length > 0 
-      ? Math.round(staff.reduce((sum, s) => sum + s.attendance_rate, 0) / staff.length) 
+    avgAttendance: staff.length > 0
+      ? Math.round(staff.reduce((sum, s) => sum + s.attendance_rate, 0) / staff.length)
       : 0,
     topPerformerCount: staff.filter(s => s.performance_score >= 90).length,
     needsAttentionCount: staff.filter(s => s.performance_score < 75 || s.attendance_rate < 90).length
@@ -170,7 +170,7 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
                     <Text fontSize="sm" fontWeight="medium">{alert.title}</Text>
                     <Text fontSize="xs" color="gray.600">{alert.description}</Text>
                   </VStack>
-                  <Badge 
+                  <Badge
                     colorPalette={alert.type === 'success' ? 'green' : alert.type === 'warning' ? 'orange' : 'blue'}
                     size="sm"
                   >
@@ -205,10 +205,10 @@ export function PerformanceDashboard({ compact = false, showDetails = true }: Pe
                     <Text fontSize="sm" fontWeight="bold" color="green.600">
                       {performer.performance_score}%
                     </Text>
-                    <Progress 
-                      value={performer.performance_score} 
-                      size="xs" 
-                      w="60px" 
+                    <Progress
+                      value={performer.performance_score}
+                      size="xs"
+                      w="60px"
                       colorPalette="green"
                     />
                   </VStack>

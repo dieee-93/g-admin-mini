@@ -1,7 +1,7 @@
 /**
- * STAFF ROLES LIST
+ * TEAM ROLES LIST
  * 
- * Displays staff roles in a card-based list with actions
+ * Displays team roles in a card-based list with actions
  * 
  * @version 1.0.0
  */
@@ -24,9 +24,9 @@ import {
   CurrencyDollarIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
-import type { JobRole } from '../../../types/jobRole';
+import type { JobRole } from '@/modules/team/types/jobRole';
 
-interface StaffRolesListProps {
+interface TeamRolesListProps {
   roles: JobRole[];
   onEdit: (role: JobRole) => void;
   onDelete: (role: JobRole) => void;
@@ -51,13 +51,13 @@ function getDepartmentColor(department?: string | null): string {
   return DEPARTMENT_COLORS[department] || 'gray';
 }
 
-export function StaffRolesList({
+export function TeamRolesList({
   roles,
   onEdit,
   onDelete,
   onToggleActive,
   isToggling,
-}: StaffRolesListProps) {
+}: TeamRolesListProps) {
   if (roles.length === 0) {
     return (
       <EmptyState
@@ -117,7 +117,7 @@ export function StaffRolesList({
                           </Badge>
                         )}
                       </HStack>
-                      
+
                       {role.description && (
                         <Text color="gray.600" fontSize="sm" lineClamp={1}>
                           {role.description}
@@ -156,7 +156,7 @@ export function StaffRolesList({
                       >
                         <Icon as={PencilIcon} boxSize={4} />
                       </Button>
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -169,7 +169,7 @@ export function StaffRolesList({
 
                       <Switch
                         checked={role.is_active}
-                        onCheckedChange={() => onToggleActive(role)}
+                        onChange={() => onToggleActive(role)}
                         disabled={isToggling === role.id}
                         size="sm"
                       />

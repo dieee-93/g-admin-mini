@@ -27,7 +27,6 @@
  */
 
 import React from 'react';
-import { Collapsible } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import {
   Box,
@@ -36,7 +35,8 @@ import {
   Button,
   Icon,
   Typography,
-  Progress
+  Progress,
+  Collapsible
 } from '@/shared/ui';
 
 // ===============================

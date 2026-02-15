@@ -6,9 +6,10 @@ import {
   Grid,
   Select,
   Alert,
-  createListCollection
-} from '@chakra-ui/react';
-import { InputField, CardWrapper } from '@/shared/ui';
+  createListCollection,
+  InputField,
+  CardWrapper
+} from '@/shared/ui';
 import { QrCodeIcon } from '@heroicons/react/24/outline';
 
 interface QRGenerationFormProps {

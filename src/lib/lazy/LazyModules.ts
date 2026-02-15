@@ -253,6 +253,17 @@ export const LazyPaymentMethodsPage = createLazyComponent(
   }
 );
 
+export const LazyUsersPage = createLazyComponent(
+  () => import('../../pages/admin/core/settings/pages/users/page'),
+  'settings-users',
+  {
+    chunkName: 'settings-users',
+    preload: false,
+    priority: 'low',
+    cacheStrategy: 'memory'
+  }
+);
+
 export const LazySettingsIntegrations = createLazyComponent(
   () => import('../../pages/admin/core/settings/pages/integrations/page'),
   'settings-integrations',
