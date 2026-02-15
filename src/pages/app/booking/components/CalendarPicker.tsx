@@ -1,7 +1,4 @@
-import { useState } from 'react';
-import { Stack, Text, Box, Grid } from '@chakra-ui/react';
-import { Button, CardWrapper } from '@/shared/ui';
-import { Icon } from '@/shared/ui/Icon';
+import { Stack, Text, Box, Grid, Button, CardWrapper, Icon } from '@/shared/ui';
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useAvailability } from '../hooks/useBooking';
 import type { AvailableSlotInfo } from '@/types/appointment';

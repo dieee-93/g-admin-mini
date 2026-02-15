@@ -8,8 +8,11 @@ import {
   HStack,
   Text,
   Button,
-  Grid, 
-} from '@chakra-ui/react';
+  Grid,
+  Icon,
+  MetricCard,
+  CardWrapper
+} from '@/shared/ui';
 import {
   HomeIcon,
   ShoppingBagIcon,
@@ -17,8 +20,6 @@ import {
   HeartIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import { MetricCard, CardWrapper } from '@/shared/ui';
 
 // Componente de bienvenida personalizado
 function WelcomeHero() {

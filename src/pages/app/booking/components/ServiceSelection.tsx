@@ -1,5 +1,4 @@
-import { Stack, Text, Box, Grid, Image } from '@chakra-ui/react';
-import { Icon, CardWrapper, Badge } from '@/shared/ui';
+import { Stack, Text, Box, Grid, Image, Icon, CardWrapper, Badge } from '@/shared/ui';
 import { ClockIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { useServices } from '../hooks/useBooking';
 import type { ServiceProduct } from '@/types/appointment';

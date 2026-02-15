@@ -1,5 +1,4 @@
-import { Stack, Text, Box, Avatar, Grid } from '@chakra-ui/react';
-import { Button, CardWrapper, Badge } from '@/shared/ui';
+import { Stack, Text, Box, Avatar, Grid, Button, CardWrapper, Badge } from '@/shared/ui';
 import { useProfessionalsForService } from '../hooks/useBooking';
 import type { ProfessionalProfile } from '@/types/appointment';
 

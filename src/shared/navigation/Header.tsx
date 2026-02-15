@@ -147,9 +147,10 @@ export const Header = memo(function Header({ actions }: HeaderProps) {
             <Menu.Trigger asChild>
               <Button variant="ghost" size="sm">
                 <Stack direction="row" gap="4">
-                  <Avatar.Root size="sm">
-                    <Avatar.Fallback name={(user as any)?.email || 'Usuario'} />
-                  </Avatar.Root>
+                  <Avatar 
+                    size="sm" 
+                    name={(user as any)?.email || 'Usuario'} 
+                  />
                   <Box 
                     display={{ base: 'none', md: 'flex' }}
                     flexDirection="column"

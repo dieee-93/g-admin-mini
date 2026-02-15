@@ -7,13 +7,16 @@ import {
   VStack,
   HStack,
   Text,
-
   Switch,
   Tabs,
   Avatar,
   Badge,
-  Grid
-} from '@chakra-ui/react';
+  Grid,
+  CardWrapper,
+  Button,
+  Icon,
+  InputField
+} from '@/shared/ui';
 import {
   UserIcon,
   BellIcon,
@@ -24,7 +27,6 @@ import {
   StarIcon,
   GiftIcon
 } from '@heroicons/react/24/outline';
-import { CardWrapper, Button, Icon, InputField  } from '@/shared/ui';
 
 // Componente de sección del perfil
 function ProfileSection() {
@@ -56,9 +58,7 @@ function ProfileSection() {
           
           {/* Avatar y nombre principal */}
           <HStack gap="4" align="center">
-            <Avatar.Root size="xl">
-              <Avatar.Fallback name={profileData.fullName} />
-            </Avatar.Root>
+            <Avatar size="xl" name={profileData.fullName} />
             <VStack align="start" gap="1">
               <Text fontSize="xl" fontWeight="bold">
                 {profileData.fullName}
@@ -171,7 +171,7 @@ function NotificationPreferences() {
 
   return (
     <CardWrapper variant="elevated">
-      <CardWrapper>
+      <CardWrapper.Body>
         <VStack align="stretch" gap="4">
           <Text fontSize="lg" fontWeight="semibold">
             Preferencias de Notificación
@@ -187,19 +187,17 @@ function NotificationPreferences() {
                   {option.description}
                 </Text>
               </VStack>
-              <Switch.Root
+              <Switch
                 checked={preferences[option.key]}
                 onCheckedChange={() => togglePreference(option.key)}
                 colorPalette="blue"
               >
-                <Switch.Track>
-                  <Switch.Thumb />
-                </Switch.Track>
-              </Switch.Root>
+                {option.title}
+              </Switch>
             </HStack>
           ))}
         </VStack>
-      </CardWrapper>
+      </CardWrapper.Body>
     </CardWrapper>
   );
 }
@@ -225,7 +223,7 @@ function AddressesSection() {
 
   return (
     <CardWrapper variant="elevated">
-      <CardWrapper>
+      <CardWrapper.Body>
         <VStack align="stretch" gap="4">
           <HStack justify="space-between" align="center">
             <Text fontSize="lg" fontWeight="semibold">
@@ -398,15 +396,11 @@ function SecuritySection() {
                   </Text>
                 </VStack>
               </HStack>
-              <Switch.Root colorPalette="green">
-                <Switch.Track>
-                  <Switch.Thumb />
-                </Switch.Track>
-              </Switch.Root>
+              <Switch colorPalette="green" />
             </HStack>
           </VStack>
         </VStack>
-      </CardBody>
+      </CardWrapper.Body>
     </CardWrapper>
   );
 }
@@ -415,7 +409,7 @@ function SecuritySection() {
 function LoyaltyProgram() {
   return (
     <CardWrapper variant="elevated" bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" color="white">
-      <CardBody>
+      <CardWrapper.Body>
         <VStack align="stretch" gap="4">
           <HStack gap="3" align="center">
             <Icon icon={StarIcon} size="lg" />

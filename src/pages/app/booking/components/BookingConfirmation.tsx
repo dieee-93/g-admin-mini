@@ -1,6 +1,4 @@
-import { Stack, Text, Box, Textarea } from '@chakra-ui/react';
-import { Button, CardWrapper, Badge } from '@/shared/ui';
-import { Icon } from '@/shared/ui/Icon';
+import { Stack, Text, Box, Textarea, Button, CardWrapper, Badge, Icon } from '@/shared/ui';
 import {
   CalendarIcon,
   ClockIcon,

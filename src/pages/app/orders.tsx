@@ -11,8 +11,10 @@ import {
   Badge,
   Tabs,
   Progress,
-  Grid
-} from '@chakra-ui/react';
+  Grid,
+  Icon,
+  CardWrapper
+} from '@/shared/ui';
 import {
   ListBulletIcon,
   ClockIcon,
@@ -22,8 +24,6 @@ import {
   EyeIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { Icon } from '@/shared/ui/Icon';
-import { CardWrapper } from '@/shared/ui';
 import { logger } from '@/lib/logging';
 // Tipos para pedidos
 interface OrderItem {

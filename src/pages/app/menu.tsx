@@ -10,16 +10,19 @@ import {
   Button,
   Grid,
   Badge,
-  Tabs
-} from '@chakra-ui/react';
-import { CardWrapper, Icon, InputField } from '@/shared/ui';
+  Tabs,
+  CardWrapper,
+  Icon,
+  InputField
+} from '@/shared/ui';
 import { logger } from '@/lib/logging';
 import {
   ShoppingBagIcon,
   MagnifyingGlassIcon,
   HeartIcon,
   PlusIcon,
-  StarIcon
+  StarIcon,
+  QrCodeIcon
 } from '@heroicons/react/24/outline';
 
 // Tipos para productos
